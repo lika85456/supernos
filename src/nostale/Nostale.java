@@ -346,9 +346,14 @@ public class Nostale {
               	  break;
 				
 		case "dir":
-		dir 1 {CharacterId} {Direction}
+		//dir 1 {CharacterId} {Direction}
 		GameData.Characters.get(pac.getInt(2)).Direction = pac.getInt(3);
-	  	  break;		
+	  	  break;	
+				
+		case "rc":
+		//rc 1 {CharacterId} {characterHealth} 0
+		GameData.Characters.get(pac.getInt(2)).HP = pac.getInt(3);
+		  break		
               	//Attacking
                 //case "sr":
               	//  GameData.Character.skills[GameData.Character.getSkillPosByCastID(pac.getInt(1))].IsOnCooldown = false;
