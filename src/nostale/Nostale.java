@@ -344,6 +344,11 @@ public class Nostale {
               		  GameData.Character.IsSitting = pac.splited[3]=="1";
               	  }
               	  break;
+				
+		case "dir":
+		dir 1 {CharacterId} {Direction}
+		GameData.Characters.get(pac.getInt(2)).Direction = pac.getInt(3);
+	  	  break;		
               	//Attacking
                 //case "sr":
               	//  GameData.Character.skills[GameData.Character.getSkillPosByCastID(pac.getInt(1))].IsOnCooldown = false;
@@ -374,7 +379,7 @@ public class Nostale {
                     {
                   	  //su 1 {hitRequest.Session.Character.CharacterId} 3 {MapMonsterId} {hitRequest.Skill.SkillVNum} {hitRequest.Skill.Cooldown} {hitRequest.SkillCombo.Animation} {hitRequest.SkillCombo.Effect} {hitRequest.Session.Character.PositionX} {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)} {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)} {damage} {hitmode} {hitRequest.Skill.SkillType - 1}
                       //Mob m = GameData.Mobs.get(pac.getInt(4));
-                      //TODO dodìlat!!!
+                      //TODO dodÃ¬lat!!!
                       if(pac.getInt(11)==0) //Monster died
                       {
                     	  GameData.Mobs.remove(pac.getInt(4));
