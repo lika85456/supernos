@@ -34,8 +34,7 @@ public class Character {
     public Boolean ShouldRest;
     
     public Inventory inventory;
-    public BattlePacketHandler BattleHandler = new BattlePacketHandler();
-    public WalkPacketHandler WalkHandler = new WalkPacketHandler();
+
     
     
     
