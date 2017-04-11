@@ -30,7 +30,7 @@ public class Character {
     
     public int Speed;
     public Skill[] skills;
-    public Boolean Moving = false;
+    public Boolean IsMoving = false;
     public Boolean ShouldRest;
     
     public Inventory inventory;
