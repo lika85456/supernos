@@ -34,14 +34,24 @@ public class Character {
     public Boolean ShouldRest;
     
     public Inventory inventory;
-    public int getSkillPosByCastID(int castID)
+    public Skill getSkillByCastID(int castID)
     {
     	for(int i=0;i<skills.length;i++)
     	{
     		if(skills[i].CastId==castID)
-    			return i;
+    			return skills[i];
     	}
-    	return -1;
+    	return null;
+    }
+    
+    public Skill getSkillByVNUM(int vnum)
+    {
+        for(Skill s:skills)
+        {
+            if(s.VNUM == vnum)
+                return s;
+        }
+        return null;
     }
 
 }
