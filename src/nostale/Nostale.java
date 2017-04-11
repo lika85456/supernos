@@ -29,12 +29,16 @@ public class Nostale {
     public GameData GameData;
     
     public MapMobInstance target;
-	
+    public BattlePacketHandler BattleHandler;
+    public WalkPacketHandler WalkHandler;
 
     
     public Nostale()
     {
-	 
+	//Handler initialisation
+	BattleHandler = new BattlePacketHandler();
+	WalkHandler = new WalkPacketHandler();
+	    
     	try
     	{
         System.out.println("Loading resources");
