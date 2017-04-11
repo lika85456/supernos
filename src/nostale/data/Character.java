@@ -34,6 +34,17 @@ public class Character {
     public Boolean ShouldRest;
     
     public Inventory inventory;
+    public BattlePacketHandler BattleHandler = new BattlePacketHandler();
+    public WalkPacketHandler WalkHandler = new WalkPacketHandler();
+    
+    
+    
+    
+    public Character()
+    {
+    }
+    
+    
     public Skill getSkillByCastID(int castID)
     {
     	for(int i=0;i<skills.length;i++)
