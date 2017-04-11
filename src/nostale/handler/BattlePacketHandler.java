@@ -24,39 +24,44 @@ public class BattlePacketHandler extends Handler{
             case "cancel": //casting spell canceled (lastSkillRequest)
                 break;
         
-            case "ct": //Somebody started attacking
+            /*case "ct": //Somebody started attacking
             //ct 1 {Session.Character.CharacterId} 3 {monsterToAttack.MapMonsterId} {ski.Skill.CastAnimation} {characterSkillInfo?.Skill.CastEffect ?? ski.Skill.CastEffect} {ski.Skill.SkillVNum}
             if(pac.getInt(2)==n.GameData.Character.id)
             {
                //TODO Parse cooldowns etc..
-               n.GameData.Character.Skills.get(); //get by VNUM
+               n.GameData.Character.getSkillByVNUM(pac.getInt(7)); //get by VNUM
             }
                 break;
+            */
 
             
             case "su": //Somebody attacked, get info from that
             //su 1 {hitRequest.Session.Character.CharacterId} 3 {MapMonsterId} {hitRequest.Skill.SkillVNum} {hitRequest.Skill.Cooldown} {hitRequest.Skill.AttackAnimation} {hitRequest.SkillEffect} {hitRequest.Session.Character.PositionX} {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)} {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)} {damage} {hitmode} {hitRequest.Skill.SkillType - 1}
                     if(pac.splited[1]=="3") //Monster attacking someone
                     {
-                  	  if(pac.getInt(4)!=GameData.Character.id){}//If it isnt me who cares?
-                  	  MobAttackedMe(pac.getInt(2));
-                  	  GameData.Character.Hp -= Integer.parseInt(pac.splited[13]);  
-                  	  send("ncif 3 "+pac.getInt(2));
+                  	  if(pac.getInt(4)!=n.GameData.Character.id){}//If it isnt me who cares?
+                  	  n.MobAttackedMe(pac.getInt(2));
+                  	  n.GameData.Character.Hp -= Integer.parseInt(pac.splited[13]);  
+                  	  n.send("ncif 3 "+pac.getInt(2));
                     }
                     else if(pac.splited[1]=="1") //Someone attacking something
                     {
+                      if(pac.getInt(2)==n.GameData.Character.id)
+                      {
+                        n.GameData.Character.getSkillByVNUM(pac.getInt(5)).IsOnCooldown = true;
+                      }
                   	  //su 1 {hitRequest.Session.Character.CharacterId} 3 {MapMonsterId} {hitRequest.Skill.SkillVNum} {hitRequest.Skill.Cooldown} {hitRequest.SkillCombo.Animation} {hitRequest.SkillCombo.Effect} {hitRequest.Session.Character.PositionX} {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)} {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)} {damage} {hitmode} {hitRequest.Skill.SkillType - 1}
                       //MapMobInstance m = n.GameData.get(pac.getInt(4));
                       //TODO dodìlat!!!
                       if(pac.getInt(11)==0) //Monster died
                       {
-                    	  GameData.Mobs.remove(pac.getInt(4));
-                    	  if(pac.getInt(2)==GameData.Character.id)// I killed it
+                    	  n.GameData.Mobs.remove(pac.getInt(4));
+                    	  if(pac.getInt(2)==n.GameData.Character.id)// I killed it
                     	  {
-                    		  if(target.id == pac.getInt(4))
+                    		  if(n.target.id == pac.getInt(4))
                     		  {
                                   //if i killed target, null it
-                    			  target = null;
+                    			  n.target = null;
                     		  }
                     	  }
                       }
@@ -66,7 +71,7 @@ public class BattlePacketHandler extends Handler{
                 
               
             case "sr": //cooldown 
-            
+            n.GameData.Character.getSkillByCastID(pac.getInt(1)).IsOnCooldown = false;
                 break;
         }
         
