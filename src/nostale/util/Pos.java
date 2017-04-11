@@ -73,6 +73,19 @@ public class Pos
     	return new Pos(p2.x+((int)((p1.x-p2.x)*(r-range)/r)),p2.y+((int)((p1.y-p2.y)*(r-range)/r)));
     }
 
+    public static Pos[] getPath(Pos p1, Pos p2)
+    {
+        ArrayList<Pos> p = new ArrayList<Pos>();
+        int range = Pos.getRange(p1,p2);
+        while(true)
+        {
+           p.add(Pos.getShortestPosInRange(range-8,p2,p1));
+           range -= 8;
+           if(range<0) return p.toArray(new Pos[0]);
+        }
+    }
+    
+    
     @Override
     public String toString()
     {
