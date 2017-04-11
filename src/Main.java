@@ -9,7 +9,7 @@ public class Main {
 	public static void main(String[] args)throws Exception {
 		Resources.load();
 		Nostale n = new Nostale();
-		n.Login("Zadek512","Computer1",CServer.CZ);
+		n.Login("","",CServer.CZ);
 		for(GameServer s:n.Login.channels)
 			if(s.channel.equals("2"))
 				n.SelectChannel(s);
