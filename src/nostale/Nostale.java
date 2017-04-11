@@ -29,9 +29,13 @@ public class Nostale {
     public GameData GameData;
     
     public MapMobInstance target;
+	
+    public BattlePacketHandler BattleHandler;
     
     public Nostale()
     {
+	BattleHandler = new BattlePacketHandler();
+	 
     	try
     	{
         System.out.println("Loading resources");
