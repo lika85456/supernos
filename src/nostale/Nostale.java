@@ -30,11 +30,10 @@ public class Nostale {
     
     public MapMobInstance target;
 	
-    public BattlePacketHandler BattleHandler;
+
     
     public Nostale()
     {
-	BattleHandler = new BattlePacketHandler();
 	 
     	try
     	{
