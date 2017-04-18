@@ -13,7 +13,8 @@ import nostale.data.MapMobInstance;
 import nostale.data.Mob;
 import nostale.data.Portal;
 import nostale.data.Skill;
-
+import nostale.handler.BattlePacketHandler;
+import nostale.handler.WalkPacketHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +37,8 @@ public class Nostale {
     public Nostale()
     {
 	//Handler initialisation
-	BattleHandler = new BattlePacketHandler();
-	WalkHandler = new WalkPacketHandler();
+	BattleHandler = new BattlePacketHandler(this);
+	WalkHandler = new WalkPacketHandler(this);
 	    
     	try
     	{
@@ -78,7 +79,7 @@ public class Nostale {
     	}
     }
 
-    public void SelectCharacter(nostale.data.Character ch)
+    public void SelectCharacter(MapCharacterInstance ch)
     {
     	try{
     		Game.selectChar(ch);	
@@ -116,12 +117,43 @@ public class Nostale {
         return m;
     }
     
+    public MapItemInstance[] GetPickupableItems()
+    {
+    	ArrayList<MapItemInstance> it = new ArrayList<MapItemInstance>();
+    	MapItemInstance item = null;
+        for(Entry<Integer, MapItemInstance> entry : GameData.Items.entrySet()) {
+        	//Integer key = entry.getKey();
+        	item = entry.getValue();
+        	if(item.OwnerID==0 || item.OwnerID==GameData.Character.id)
+        	{
+        		it.add(item);
+        	}
+        }    	
+        return it.toArray(new MapItemInstance[0]);
+    }
+    
+    public void PickUpItem(int tId)
+    {
+    	MapItemInstance item = GameData.Items.get(tId);
+    	if(!(item.OwnerID==0 || item.OwnerID==GameData.Character.id)) {return;} //item cannot be pickuped
+    	WalkHandler.Walk(Pos.getShortestPosInRange(1, item.Pos, GameData.Character.Pos));
+    	
+    	send("get 1 "+GameData.Character.id+" "+item.id);
+    	try {
+			Thread.sleep(75);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
     public void MobAttackedMe(int MobId) 
     {
     	//Mob attacked me!
     	if(GameData.Character.ShouldRest == true) //AND I WAS RESTING!!!!!!!!
     	{
     		//kill that shit
+    		System.out.println("Hp: "+GameData.Character.Hp);
     	}
     }
 
@@ -132,6 +164,7 @@ public class Nostale {
     	for(String p:received)
     	{
     		Packet pac = new Packet(p);
+    		BattleHandler.onReceive(p);
     		switch(pac.type)
         	{
         	case "c_map":
@@ -192,6 +225,10 @@ public class Nostale {
                     if(mob!=null && mob.Name==null)
                     {
                     	send("ncif 3 "+id);
+                    }
+                    if(mob==null)
+                    {
+                    	mob = new MapMobInstance();
                     }
                     mob.id = id;
                     mob.Pos = pos;                
@@ -354,59 +391,18 @@ public class Nostale {
 				
 		case "dir":
 		//dir 1 {CharacterId} {Direction}
-		GameData.Characters.get(pac.getInt(2)).Direction = pac.getInt(3);
+		GameData.Characters.get(pac.getInt(2)).Direction = (short)pac.getInt(3);
 	  	  break;	
 				
 		case "rc":
 		//rc 1 {CharacterId} {characterHealth} 0
-		GameData.Characters.get(pac.getInt(2)).HP = pac.getInt(3);
-		  break		
-              	//Attacking
-                //case "sr":
-              	//  GameData.Character.skills[GameData.Character.getSkillPosByCastID(pac.getInt(1))].IsOnCooldown = false;
-              	//  break;
-              	  
-                case "ct":
-                	//ct 1 {Session.Character.CharacterId} 1 {Session.Character.CharacterId} {ski.Skill.CastAnimation} {skillinfo?.Skill.CastEffect ?? ski.Skill.CastEffect} {ski.Skill.SkillVNum}
-                	if(pac.getInt(2)==GameData.Character.id)//Else who cares?
-                	{
-                		int skillVNUM = pac.getInt(7);
-                		for(int ii = 0;ii<GameData.Character.skills.length;ii++)
-                		if(GameData.Character.skills[ii].VNUM==skillVNUM)GameData.Character.skills[ii].IsOnCooldown = true;
-                	}
-                	
-                	break;
-                
-                
-                
-                case "su":
-                    if(pac.splited[1]=="3") //Monster attacking someone
-                    {
-                  	  if(pac.getInt(4)!=GameData.Character.id){}//If it isnt me who cares?
-                  	  MobAttackedMe(pac.getInt(2));
-                  	  GameData.Character.Hp -= Integer.parseInt(pac.splited[13]);  
-                  	  send("ncif 3 "+pac.getInt(2));
-                    }
-                    else if(pac.splited[1]=="1") //Someone attacking something
-                    {
-                  	  //su 1 {hitRequest.Session.Character.CharacterId} 3 {MapMonsterId} {hitRequest.Skill.SkillVNum} {hitRequest.Skill.Cooldown} {hitRequest.SkillCombo.Animation} {hitRequest.SkillCombo.Effect} {hitRequest.Session.Character.PositionX} {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)} {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)} {damage} {hitmode} {hitRequest.Skill.SkillType - 1}
-                      //Mob m = GameData.Mobs.get(pac.getInt(4));
-                      //TODO dodìlat!!!
-                      if(pac.getInt(11)==0) //Monster died
-                      {
-                    	  GameData.Mobs.remove(pac.getInt(4));
-                    	  if(pac.getInt(2)==GameData.Character.id)// I killed it
-                    	  {
-                    		  if(target.id == pac.getInt(4))
-                    		  {
-                    			  target = null;
-                    		  }
-                    	  }
-                      }
-                    	  
-                    }
-                    
-                break;
+		GameData.Characters.get(pac.getInt(2)).Hp = pac.getInt(3);
+		  break;		
+
+		case "eff_ob":
+		//eff_ob  -1 -1 0 4269 - when i die
+		
+        break;
                 
                 
                 

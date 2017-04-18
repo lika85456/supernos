@@ -3,7 +3,7 @@ import java.util.*;
 public class GameData {
     public String id = "";
     public String pw = "";
-    public nostale.data.Character[] characters;
+    public MapCharacterInstance[] characters;
     public int session = 0;
     public MapCharacterInstance Character;
     

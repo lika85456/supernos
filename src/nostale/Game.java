@@ -4,6 +4,7 @@ import java.util.*;
 import nostale.util.LogType;
 import nostale.util.Logger;
 import nostale.net.*;
+import nostale.data.MapCharacterInstance;
 import nostale.data.Character;
 import nostale.data.ClassType;
 import nostale.data.GameData;
@@ -40,7 +41,7 @@ public class Game
          }, 60*1000, 60*1000);
     }
     
-    public void selectChar(Character ch) throws Exception
+    public void selectChar(MapCharacterInstance ch) throws Exception
     {
         this.GameData.Character = ch;
         send("select "+ch.Slot);
@@ -68,7 +69,7 @@ public class Game
     private void parseChars() throws Exception
     {
         String lastPacket = "";
-        ArrayList<Character> tempChars = new ArrayList<Character>();
+        ArrayList<MapCharacterInstance> tempChars = new ArrayList<MapCharacterInstance>();
         while(!lastPacket.contains("clist_end"))
         {
           String[] received = c.GetReceived();
@@ -86,13 +87,13 @@ public class Game
         } 
         send("c_close");
         send("f_stash_end");
-        this.GameData.characters = tempChars.toArray(new Character[0]);
+        this.GameData.characters = tempChars.toArray(new MapCharacterInstance[0]);
     
     }
         
-    private Character parseChar(String pa)
+    private MapCharacterInstance parseChar(String pa)
     {
-       Character chara = new Character();
+       MapCharacterInstance chara = new MapCharacterInstance();
        String[] p = parsePacket(pa);
        chara.Slot = (byte)Integer.parseInt(p[1]);
        chara.Name = p[2];

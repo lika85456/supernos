@@ -1,15 +1,17 @@
 import nostale.resources.Resources;
 
 import nostale.*;
+import nostale.data.MapItemInstance;
 import nostale.util.Pos;
 import java.util.*;
 
 public class Main {
        
 	public static void main(String[] args)throws Exception {
+
 		Resources.load();
 		Nostale n = new Nostale();
-		n.Login("","",CServer.CZ);
+		n.Login("Zadek512","Computer1",CServer.CZ);
 		for(GameServer s:n.Login.channels)
 			if(s.channel.equals("2"))
 				n.SelectChannel(s);
@@ -20,25 +22,32 @@ public class Main {
 		Boolean loop = true;
 		Boolean bot = true;
 		//n.Walk(30,30);
-		int iter = 0;
+		n.ReceiveAndParse();
 		while(loop)
 		{
-			iter++;
-	        n.ReceiveAndParse();
+
+	        
             if(n.target==null && bot) //Target is dead or not set
             {
             	//TODO Set new target
             	n.target = n.GetNearestMob();
-            	System.out.println("Selected target: "+n.target.Name+"| Range:"+Pos.getRange(n.target.Pos, n.GameData.Character.Pos));
+            	
             }
             
             if(bot && n.target!=null)
             {
-            	n.Attack(n.target, n.GameData.Character.skills[0]);
+            	n.BattleHandler.UseSkill(n.GameData.Character.skills[0],n.target);
             }
             
-            if(iter==10) {System.out.println(Logger.logged);}
-            Thread.sleep(10);
+            MapItemInstance[] MyItemsOnTheGround = n.GetPickupableItems();
+            for(MapItemInstance item : MyItemsOnTheGround)
+            {
+            	System.out.println("Trying to pickup: "+item.id+" on "+item.Pos);
+            	n.PickUpItem(item.id);
+            }
+            
+            n.ReceiveAndParse();
+            Thread.sleep(5);
 		}
 		
 	}

@@ -1,7 +1,7 @@
 package nostale.util;
 
 import nostale.resources.Map;
-
+import java.util.ArrayList;
 public class Pos
 {
     public short x;
@@ -66,11 +66,11 @@ public class Pos
     	return null;
     }
     
-    public static Pos getShortestPosInRange(int range,Pos p1, Pos p2)
+    public static Pos getShortestPosInRange(int range,Pos mob, Pos character)
     {
-    	int r = getRange(p1,p2);
-    	if(r<range) {return p2;}
-    	return new Pos(p2.x+((int)((p1.x-p2.x)*(r-range)/r)),p2.y+((int)((p1.y-p2.y)*(r-range)/r)));
+    	int r = getRange(mob,character);
+    	if(r<range) {return character;}
+    	return new Pos(character.x+((int)((mob.x-character.x)*(r-range)/r)),character.y+((int)((mob.y-character.y)*(r-range)/r)));
     }
 
     public static Pos[] getPath(Pos p1, Pos p2)
