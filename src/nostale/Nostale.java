@@ -33,14 +33,14 @@ public class Nostale {
     public MapMobInstance target;
     public BattlePacketHandler BattleHandler;
     public WalkPacketHandler WalkHandler;
-
+    public Nosbasar Nosbasar = new Nosbasar();
     
     public Nostale()
     {
-	//Handler initialisation
+	//Handler initialization
 	BattleHandler = new BattlePacketHandler(this);
 	WalkHandler = new WalkPacketHandler(this);
-	    
+	 this.Nosbasar.n = this;
     	try
     	{
         System.out.println("Loading resources");
@@ -204,179 +204,28 @@ public class Nostale {
                 break;
                 */
                 
-                case "lev":
-                //lev {Level} {LevelXp} {JobLevel} {JobXP} {XPLoad()} {JobLoad} {Reput} {GetCP()} {HeroXp} {HeroLevel} {HeroXPLoad()}";
-                GameData.Character.Level = (byte)pac.getInt(1);
-                GameData.Character.LevelXp = pac.getInt(2);
-                GameData.Character.JobLevel = (byte)pac.getInt(3);
-                GameData.Character.JobLevelXp = pac.getInt(4);
-                GameData.Character.LevelMaxXp = pac.getInt(5);
-                GameData.Character.JobLevelMaxXp = pac.getInt(6);
-                break;
-                
-                case "ski":
-                ArrayList<Skill> skills = new ArrayList<Skill>();
-                for(int i=3;i<13;i++)
-                {
-                   if(pac.splited[i].equals("ski")) continue;
-                   skills.add(Resources.getSkillByVNUM(Integer.parseInt(pac.splited[i])));
-                   
-                }
-                GameData.Character.skills = skills.toArray(new Skill[0]);
-                break;
+
+               
                 
                 case "at":
                 GameData.Character.id = pac.getInt(1);
-                GameData.Character.Pos = new Pos(pac.getInt(3),pac.getInt(4));
                 break;
-                
-                case "cond":
-                GameData.Character.Speed = pac.getInt(5);
-                break;
+               
                
                 case "sc_p_stc":
                 send("npinfo 0");
                 break;
                 
-                case "mv":
-                if(pac.getInt(1)==3)
-                {
-                    int id = pac.getInt(2);
-                    Pos pos = new Pos(pac.getInt(3),pac.getInt(4));
-                    MapMobInstance mob = GameData.Mobs.get(id);
-                    if(mob!=null && mob.Name==null)
-                    {
-                    	send("ncif 3 "+id);
-                    }
-                    if(mob==null)
-                    {
-                    	mob = new MapMobInstance();
-                    }
-                    mob.id = id;
-                    mob.Pos = pos;                
-                    GameData.Mobs.put(mob.id,mob);
-                  
-                }
-                else if(pac.getInt(1)==1)
-                {
-                	int id = pac.getInt(2);
-                	MapCharacterInstance ch = GameData.Characters.get(id);
-                	if(ch==null) {ch = new MapCharacterInstance();}
-                	ch.Pos = new Pos(pac.getInt(3),pac.getInt(4));
-                	ch.id = id;
-                	GameData.Characters.put(id, ch);
-                }
-                break;
                 
-                case "in":
-                if(pac.splited[1].equals("1"))
-                {//Character move  
-                	//TODO missing hp and mp!!!!
-                    MapCharacterInstance tChar;
-                    try{
-                       tChar = GameData.Characters.get(pac.getInt(4));}
-                  catch(Exception e) {tChar = new MapCharacterInstance();}
-                      if(tChar==null) {tChar = new MapCharacterInstance();}
-                      tChar.Name = pac.get(2);
-                      tChar.Pos = new Pos(pac.getInt(5),pac.getInt(6));
-                      tChar.Direction = (short)pac.getInt(7);
-                      tChar.Authority = (byte)pac.getInt(8);
-                      tChar.IsSitting = "1"==pac.splited[16];
-                      tChar.IsInvisible = "1"==pac.splited[28];
-                      tChar.Level = (byte)Integer.parseInt(pac.splited[32]);
-                      if(tChar.id!=0)
-                      GameData.Characters.put((int)tChar.id, tChar);
-
-                }
-                else if(pac.splited[1].equals("3"))
-                {//Mob move                
-                   MapMobInstance t = GameData.Mobs.get(pac.getInt(3));
-                   if(t==null) t=new MapMobInstance();
-                   t.Pos = new Pos(pac.getInt(4),pac.getInt(5));
-                   t.VNUM = (short)pac.getInt(2);
-                   t.id = pac.getInt(3);
-                   t.Hp = t.MaxHp*(pac.getInt(7)/100);
-                   t.Mp = t.MaxMp*(pac.getInt(7)/100);
-                   Mob mt = Resources.getMobByVNUM(t.VNUM);
-                   if(mt!=null)
-                   t.Name = mt.Name;
-                   GameData.Mobs.put(t.id,t);
-
-                }
-                break;
+                
+                
                
                 
-                case "stat":
-                //stat {Hp} {HPLoad()} {Mp} {MPLoad()} 0 {option}
-                GameData.Character.Hp = pac.getInt(1);
-                GameData.Character.MaxHp = pac.getInt(2);
-                GameData.Character.Mp = pac.getInt(3);
-                GameData.Character.MaxMp = pac.getInt(4);    
-                break;
                 
-                case "drop":
-                MapItemInstance i = new MapItemInstance();
-                i.VNUM = (short)pac.getInt(1);
-                i.id = pac.getInt(2);
-                i.Pos = new Pos(pac.getInt(3),pac.getInt(4));
-                i.Amount = pac.getInt(5);
-                i.OwnerID = pac.getInt(7);
-
-                GameData.Items.put(i.id,i);
-                break;
                 
-                case "get":
-                	try{
-              	  GameData.Items.remove(pac.getInt(3));
-                	}
-                	catch(Exception e){e.printStackTrace();}
-              	  break;
               	  
-                case "out":
-                	try
-                	{
-                	if(pac.getInt(1)==1)//Player removed
-                	{
-                		GameData.Characters.remove(pac.getInt(2));
-                		
-                	}
-                	else if(pac.getInt(1)==9)//Item removed
-                	{
-
-              		GameData.Items.remove(pac.getInt(2));
-                	}
-                	}
-                	catch(Exception e){}
-                	  break;
                 
-                case "st":
-                int packetType = pac.getInt(1);
-                if(packetType == 1)
-                {  
                 
-                   MapCharacterInstance ch = GameData.Characters.get(pac.getInt(2));
-                   if(ch==null) ch = new MapCharacterInstance();
-                   ch.Level = (byte)pac.getInt(3);
-                   ch.Hp = pac.getInt(7);
-                   ch.Hp = Integer.parseInt(pac.splited[8]);
-                   ch.MaxHp = (int)(ch.Hp/pac.getInt(5)*100);
-                   ch.MaxMp = (int)(ch.Mp/pac.getInt(6)*100);              
-                   GameData.Characters.put((int)ch.id, ch);
-                }
-                else if(packetType == 3)
-                {
-                   MapMobInstance m = GameData.Mobs.get(pac.getInt(2));
-                   if(m==null) {m=new MapMobInstance();}
-                   m.id = pac.getInt(2);
-                   m.Level = (short)pac.getInt(3);
-                   m.Hp = pac.getInt(7);
-                   m.Mp = Integer.parseInt(pac.splited[8]);
-                   m.MaxHp = (int)(m.Hp/pac.getInt(5)*100);
-                   m.MaxMp = (int)(m.Mp/pac.getInt(6)*100);                   
-                   GameData.Mobs.put(m.id,m);
-                }
-                
-                break;
                 
                 case "inv":
               	  GameData.Character.inventory.parsePacketINV(pac.packet);
@@ -385,14 +234,6 @@ public class Nostale {
                    GameData.Character.Gold = pac.getInt(1);
                 break;
                 
-                case "gp":
-                   Portal pop = new Portal();
-                   pop.pos = new Pos(pac.getInt(1),pac.getInt(2));
-                   pop.MapID = pac.getInt(3);
-                   pop.Type = pac.getInt(4);
-                   pop.isEnabled = pac.splited[6]=="1";
-                   GameData.Portals.put(pop.pos.x*pop.pos.y, pop);
-                break;
                 
                 case "mapout":
                   send("c_close");
@@ -404,23 +245,7 @@ public class Nostale {
                   GameData.Portals = new HashMap<Integer, Portal>();
                 break;
                 
-                case "rest":
-              	  // rest 1 374541 0
-              	  if(pac.getInt(2)==GameData.Character.id)
-              	  {
-              		  GameData.Character.IsSitting = pac.splited[3]=="1";
-              	  }
-              	  break;
-				
-		case "dir":
-		//dir 1 {CharacterId} {Direction}
-		GameData.Characters.get(pac.getInt(2)).Direction = (short)pac.getInt(3);
-	  	  break;	
-				
-		case "rc":
-		//rc 1 {CharacterId} {characterHealth} 0
-		GameData.Characters.get(pac.getInt(2)).Hp = pac.getInt(3);
-		  break;		
+               
 
 		case "eff_ob":
 		//eff_ob  -1 -1 0 4269 - when i die
@@ -435,13 +260,13 @@ public class Nostale {
                 
                 
                 //Nosbasar..
-                /*case "rc_blist":
-                   this.nb.parse(packet);
+                case "rc_blist":
+                   this.Nosbasar.parse(pac);
                 break;
                 case "rc_buy":
-                   this.nb.parse(packet);
+                   this.Nosbasar.parse(pac);
                 break;
-                */
+                
         	}
         	
     	}

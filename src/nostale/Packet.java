@@ -23,4 +23,8 @@ public class Packet {
     	 catch(Exception e){e.printStackTrace();}
     	 return 0;
      }
+     public int getCount()
+     {
+    	 return this.splited.length;
+     }
 }

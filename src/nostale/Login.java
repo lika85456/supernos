@@ -11,9 +11,9 @@ import nostale.net.*;
 public class Login
 {
     //md5(nostalex.dat)+md5(nostale.dat)
-    public String HASH = "0E4ABC32230F2F0EB05E2DC910AAE165D90379DDDB8D7E96CBA1881D9631B941";
+    public String HASH = "224269DDC894E12B92DF86D86BD8D2D5E9BE1E43722632F078B8C685844B72C0";
     //Version
-    public String version = "0.9.3.3068";
+    public String version = "0.9.3.3071";
     public SessionEnum sessionState = SessionEnum.NOTHING;
     //NOTHING
     //NO_INTERNET_CONNECTION
