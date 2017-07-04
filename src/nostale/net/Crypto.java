@@ -1,4 +1,5 @@
-package nostale.net;import java.security.*;
+package nostale.net;
+import java.security.*;
 import java.util.ArrayList;
 import java.math.*;
 
@@ -87,7 +88,7 @@ public class Crypto {
 
 						length -= 2;
 						}
-						catch(Exception e){System.out.println(ArrayListToString(current_packet));}
+						catch(Exception e){System.out.println("Exception packet: "+ArrayListToString(current_packet));}
 					} else {
 						--length;
 					}

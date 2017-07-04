@@ -34,6 +34,15 @@ public class Resources
         }
         return null;    	
     }
+    public static Item getItemByNameID(int id)
+    {
+        for(int i = 0;i<Resources.items.length;i++)
+        {
+          if(Resources.items[i].NameID==id) 
+          return Resources.items[i];
+        }
+        return null;      	
+    }
     public static Skill getSkillByVNUM(int id)
     {
         for(int i = 0;i<Resources.skills.length;i++)

@@ -1,6 +1,7 @@
 package nostale;
 
 import nostale.net.Connection;
+import nostale.net.Crypto;
 import nostale.resources.LoadItems;
 import nostale.resources.LoadMobs;
 import nostale.resources.LoadSkills;
@@ -8,6 +9,7 @@ import nostale.resources.Resources;
 import nostale.util.Pos;
 import nostale.data.MapCharacterInstance;
 import nostale.data.GameData;
+import nostale.data.InventoryItemInstance;
 import nostale.data.MapItemInstance;
 import nostale.data.MapMobInstance;
 import nostale.data.Mob;
@@ -28,7 +30,6 @@ public class Nostale {
     public Game Game;
     public Connection c;
     public GameData GameData;
-    
     public MapMobInstance target;
     public BattlePacketHandler BattleHandler;
     public WalkPacketHandler WalkHandler;
@@ -100,6 +101,14 @@ public class Nostale {
     	catch(Exception e){e.printStackTrace();}
     	
     }
+    public void sendAfterWait(String packet,int miliseconds)
+    {
+    	try{
+
+    		Game.sendAfterWait(packet,miliseconds);
+    	}
+    	catch(Exception e){e.printStackTrace();}    	
+    }
     
     public MapMobInstance GetNearestMob()
     {
@@ -156,7 +165,20 @@ public class Nostale {
     		System.out.println("Hp: "+GameData.Character.Hp);
     	}
     }
-
+    
+    public void UseItem(InventoryItemInstance i)
+    {
+    	send("u_i 1 "+GameData.Character.id+" "+i.Type+" "+i.InventoryPos+" 0 0");
+    }
+    
+    public void WearSP()
+    {
+    	send("sl 0");
+    }
+    public void SPDown()
+    {
+    	send("sl 0");
+    }
     
     public void ReceiveAndParse()
     {
@@ -194,7 +216,7 @@ public class Nostale {
                 
                 case "ski":
                 ArrayList<Skill> skills = new ArrayList<Skill>();
-                for(int i=3;i<pac.splited.length;i++)
+                for(int i=3;i<13;i++)
                 {
                    if(pac.splited[i].equals("ski")) continue;
                    skills.add(Resources.getSkillByVNUM(Integer.parseInt(pac.splited[i])));
@@ -255,6 +277,7 @@ public class Nostale {
                        tChar = GameData.Characters.get(pac.getInt(4));}
                   catch(Exception e) {tChar = new MapCharacterInstance();}
                       if(tChar==null) {tChar = new MapCharacterInstance();}
+                      tChar.Name = pac.get(2);
                       tChar.Pos = new Pos(pac.getInt(5),pac.getInt(6));
                       tChar.Direction = (short)pac.getInt(7);
                       tChar.Authority = (byte)pac.getInt(8);
@@ -403,6 +426,11 @@ public class Nostale {
 		//eff_ob  -1 -1 0 4269 - when i die
 		
         break;
+        
+		case "delay":
+			//delay 5000 3 #sl^1 
+			sendAfterWait(pac.get(3),pac.getInt(1));
+			break;
                 
                 
                 

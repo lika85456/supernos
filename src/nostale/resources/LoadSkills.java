@@ -254,11 +254,10 @@ public class LoadSkills
                  String id = splited[0];
                  for(int i = 0;i<skills.size();i++)
                  {
-                       if(skills.get(i).NameID==id)
+                       if(skills.get(i).NameID.equals(id))
                        {
                          Skill tSkill = skills.get(i);
-                         tSkill.Name = splited[1];
-                         
+                         tSkill.Name = "";
                          //tItem.Name = splited[1];
                          
                          for(int ii=1;ii<splited.length;ii++)

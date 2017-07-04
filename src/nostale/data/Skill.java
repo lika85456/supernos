@@ -39,4 +39,13 @@ public class Skill {
     public String NameID;
     public Boolean IsOnCooldown = false;
     public Skill(){}
+    
+    public String toString()
+    {
+    	String ret = "";
+    	ret+=this.Name+"\n";
+    	ret+="	VNUM:"+this.VNUM+"\n";
+    	ret+="	MP_Cost:"+this.MpCost+"\n";
+    	return ret;
+    }
 }

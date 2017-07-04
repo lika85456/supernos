@@ -66,7 +66,6 @@ public class Item {
     public short SpType;
     public InventoryType Type;
     public short VNUM;
-
     public int NameID;
     public short WaitDelay;
     public short WaterElement;

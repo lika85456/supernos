@@ -114,6 +114,25 @@ public class Game
     	Logger.log(LogType.Send, s);
     c.Send(Crypto.EncryptGamePacket(packetId()+s,this.GameData.session,false));
     }
+    public void sendAfterWait(String s,int time) throws Exception
+    {
+    	GameData gd = this.GameData;
+    	new java.util.Timer().schedule( 
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                	try {
+						c.Send(Crypto.EncryptGamePacket(packetId()+s,gd.session,false));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                }
+            }, 
+            time 
+    );
+    
+    }
     
     
     
