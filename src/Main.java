@@ -1,11 +1,8 @@
 import nostale.resources.Resources;
 
 import nostale.*;
-import nostale.data.MapCharacterInstance;
-import nostale.data.MapItemInstance;
-import nostale.data.Skill;
-import nostale.util.Pos;
-import java.util.*;
+import nostale.data.BasarItemInstance;
+
 
 public class Main {
        
@@ -28,32 +25,25 @@ public class Main {
 
         System.out.println("Mapa:"+n.GameData.map.Name);
 		
+        
+        
 		while(loop)
 		{
-
-	       /* 
-            if(n.target==null && bot) //Target is dead or not set
-            {
-            	//TODO Set new target
-            	n.target = n.GetNearestMob();
-            	
-            }
-            
-            if(bot && n.target!=null)
-            {
-            	n.BattleHandler.UseSkill(n.GameData.Character.skills[0],n.target);
-            }
-            
-            MapItemInstance[] MyItemsOnTheGround = n.GetPickupableItems();
-            for(MapItemInstance item : MyItemsOnTheGround)
-            {
-            	System.out.println("Trying to pickup: "+item.id+" on "+item.Pos);
-            	n.PickUpItem(item.id);
-            }
-            */
-			n.Nosbasar.Search(1014);
-            n.ReceiveAndParse();
-            Thread.sleep(5);
+			n.ReceiveAndParse();
+			long price_cella = n.Nosbasar.Search(1014)[0].Price;
+			//n.ReceiveAndParse();
+	        //long price_gilli = n.Nosbasar.Search(1013)[0].Price;
+	        
+	        BasarItemInstance[] myItems = n.Nosbasar.GetMyItems();
+	        for(BasarItemInstance i : myItems)
+	        {
+	        	if(i.soldedAmount==i.Amount){
+	        		n.Nosbasar.GetMoney(i);
+	        	}
+	        }
+	        
+           
+            Thread.sleep(500);
 		}
 		
 	}

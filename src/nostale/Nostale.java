@@ -94,7 +94,7 @@ public class Nostale {
 
     public void send(String packet)
     {
-    	
+    	//System.out.println("SENT:"+packet);
     	try{
     		Game.send(packet);
     	}
@@ -187,6 +187,7 @@ public class Nostale {
     	{
     		Packet pac = new Packet(p);
     		BattleHandler.onReceive(p);
+    		//System.out.println("RECEIVED:"+p);
     		switch(pac.type)
         	{
         	case "c_map":
@@ -264,6 +265,9 @@ public class Nostale {
                    this.Nosbasar.parse(pac);
                 break;
                 case "rc_buy":
+                   this.Nosbasar.parse(pac);
+                break;
+                case "rc_slist":
                    this.Nosbasar.parse(pac);
                 break;
                 
