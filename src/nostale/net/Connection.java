@@ -44,7 +44,10 @@ public class Connection{
     {
     	String[] received = Crypto.DecryptGamePacket(getReceived()).toArray(new String[0]);
     	for(String p: received)
-    	Logger.log(LogType.Receive, p);
+    	{
+    		//Logger.log(LogType.Receive, p);
+    	}
+    	
         return  received;
     }
     public ArrayList<Integer> getReceived()

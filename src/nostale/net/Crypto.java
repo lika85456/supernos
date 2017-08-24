@@ -1,6 +1,7 @@
 package nostale.net;
 import java.security.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.math.*;
 
 public class Crypto {
@@ -44,13 +45,96 @@ public class Crypto {
 	private static String ArrayListToString(ArrayList<Integer> output) {
 		String returnValue = "";
 		for (int i = 0; i < output.size(); i++) {
-			returnValue += (char) (int)output.get(i);
+			returnValue += (char)(int)output.get(i);
 
 		}
 		return returnValue;
 	}
+	
+	private static String IntegerArrayToString(int[] input)
+	{
+		String returnValue = "";
+		for (int i = 0; i < input.length; i++) {
+			returnValue += (char)(int)input[i];
 
-	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf) {
+		}
+		return returnValue;		
+	}
+
+	private static ArrayList<Integer> StringToInt(String str)
+	{
+		ArrayList<Integer> temp = new ArrayList<Integer>();
+		for(int i=0;i<str.length();i++)
+		{
+			temp.add((int)str.charAt(i));
+		}
+		return temp;
+	}
+	
+    public static ArrayList<Integer> EncryptServerPacket(String str)
+    {
+        ArrayList<Integer> StrBytes = StringToInt(str);
+        int BytesLength = StrBytes.size();
+
+        int[] encryptedData = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 1];
+
+        int ii = 0;
+        for (int i = 0; i < BytesLength; i++)
+        {
+            if (i % 0x7E == 0)
+            {
+            	if(BytesLength-i>0x7E) encryptedData[i+ii]=0x7E;
+            	else encryptedData[i+ii]=(BytesLength-i) & 0xFF;
+                ii++;
+            }
+            encryptedData[i + ii] = reverse_byte(StrBytes.get(i));
+            System.out.println(encryptedData[i+ii]);
+        }
+        
+        encryptedData[encryptedData.length - 1] = 0xFF;
+        System.out.println(encryptedData[6]);
+        ArrayList<Integer> list = new ArrayList<Integer>(encryptedData.length);
+        for (int i : encryptedData) list.add(i);
+        return list;
+}
+	
+	
+	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf)
+	{
+         
+         ArrayList<String> packets = new ArrayList<String>();
+         int BytesLength = buf.size();
+         int ii=0;
+         int[] current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
+         for(int i = 0; i < BytesLength; i++)
+         {
+        	 if(buf.get(i)==0xFF)
+        	 {
+        		 current_packet[0] = 0;
+        		 packets.add(IntegerArrayToString(current_packet));
+        		 System.out.println(IntegerArrayToString(current_packet));
+        		 current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
+        		 
+        	 }
+             if (i % 0x7E == 0)
+             {
+             	if(BytesLength-i>0x7E) current_packet[i+ii]=0x7E;
+             	else continue;
+                 ii++;
+             }
+             current_packet[i+ii]= reverse_byte(buf.get(i));
+         }
+        return packets;
+        
+	}
+	
+	public static int reverse_byte(int s)
+	{
+		return 0xFF-s;
+	}
+	
+	
+	public static ArrayList<String> DecryptGamePacketTest(ArrayList<Integer> buf) {
 		int len = buf.size();
 		ArrayList<String> output = new ArrayList<String>();
 		ArrayList<Integer> current_packet = new ArrayList<Integer>();
@@ -96,6 +180,7 @@ public class Crypto {
 			} else {
 				while (length != 0) {
 					if (index < len) {
+						//current_packet.add(buf.get(index) ^ 0xFF);¨
 						current_packet.add(buf.get(index) ^ 0xFF);
 						++index;
 					}

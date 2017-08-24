@@ -284,6 +284,7 @@ public class Nostale {
                       tChar.IsSitting = "1"==pac.splited[16];
                       tChar.IsInvisible = "1"==pac.splited[28];
                       tChar.Level = (byte)Integer.parseInt(pac.splited[32]);
+                      tChar.id = pac.getInt(4);
                       if(tChar.id!=0)
                       GameData.Characters.put((int)tChar.id, tChar);
 
