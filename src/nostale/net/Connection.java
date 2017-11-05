@@ -1,10 +1,10 @@
 package nostale.net;
 import java.io.*;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
-import nostale.util.LogType;
-import nostale.util.Logger;
 /*
  * @author lika85456
  * @description
@@ -12,12 +12,12 @@ import nostale.util.Logger;
  * 
  */
 public class Connection{ 
-    
  
    public Socket clientSocket; 
    public DataOutputStream outToServer; 
    public BufferedReader inFromServer;
    public DataInputStream in;
+
 
    //("79.110.84.75", 4006)
    /*
@@ -43,13 +43,7 @@ public class Connection{
     public String[] GetReceived()
     {
     	String[] received = Crypto.DecryptGamePacket(getReceived()).toArray(new String[0]);
-    	
-    	for(String p: received)
-    	{
-    		//Logger.log(LogType.Receive, p);
-    		System.out.println(p);
-    	}
-    	
+    	    	
         return  received;
     }
     public ArrayList<Integer> getReceived()
@@ -75,8 +69,7 @@ public class Connection{
      */
     public void Send(String packet) throws Exception
     {     
-    	
-          outToServer.writeBytes(packet);
+    	outToServer.writeBytes(packet);
     }
 
     /*
@@ -87,5 +80,6 @@ public class Connection{
       clientSocket.close();    
     }
     
+
     
 }

@@ -1,8 +1,7 @@
 package nostale;
 import java.util.*;
 
-import nostale.util.LogType;
-import nostale.util.Logger;
+
 import nostale.net.*;
 import nostale.data.MapCharacterInstance;
 import nostale.data.Character;
@@ -111,8 +110,7 @@ public class Game
     
     public void send(String s) throws Exception
     {
-    	Logger.log(LogType.Send, s);
-    c.Send(Crypto.EncryptGamePacket(packetId()+s,this.GameData.session,false));
+    	c.Send(Crypto.EncryptGamePacket(packetId()+s,this.GameData.session,false));
     }
     public void sendAfterWait(String s,int time) throws Exception
     {

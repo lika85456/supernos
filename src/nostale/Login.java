@@ -39,7 +39,6 @@ public class Login
             {
                received = c.getReceived();
             }
-            System.out.println(Crypto.DecryptLoginPacket(received));
             parseLoginPacket(Crypto.DecryptLoginPacket(received));
             c.Close();
         }

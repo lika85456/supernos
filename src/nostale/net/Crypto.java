@@ -1,11 +1,15 @@
 package nostale.net;
 import java.security.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.io.UnsupportedEncodingException;
 import java.math.*;
 
 public class Crypto {
+	public static String LOG="";
+	
 	public static String encrypt(String passwordToHash) {
 		String generatedPassword = null;
 		try {
@@ -33,6 +37,7 @@ public class Crypto {
 		String str_dec = "";
 		for (int i = 0; i < str.size(); i++)
 			str_dec += (char) (str.get(i) - 0xF);
+		Crypto.addToLog("Login packet income", str_dec.substring(0, str_dec.length() - 1));
 		return str_dec.substring(0, str_dec.length() - 1);
 	}
 
@@ -40,6 +45,7 @@ public class Crypto {
 		String str_enc = "";
 		for (int i = 0; i < str.length(); i++)
 			str_enc += (char) ((str.charAt(i) ^ 0xC3) + 0xF);
+		Crypto.addToLog("Login packet sent",str);
 		return str_enc += (char) 0xD8;
 	}
 
@@ -74,9 +80,10 @@ public class Crypto {
 	
     public static ArrayList<Integer> EncryptServerPacket(String str)
     {
+    	Crypto.addToLog("Game packet sent",str);
     	try {
-			str = new String(str.getBytes("windows-1250"));
-		} catch (UnsupportedEncodingException e) {
+			//str = new String(str.getBytes("ISO-8859-1"));
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -95,11 +102,10 @@ public class Crypto {
                 ii++;
             }
             encryptedData[i + ii] = reverse_byte(StrBytes.get(i));
-            System.out.println(encryptedData[i+ii]);
         }
         
         encryptedData[encryptedData.length - 1] = 0xFF;
-        System.out.println(encryptedData[6]);
+
         ArrayList<Integer> list = new ArrayList<Integer>(encryptedData.length);
         for (int i : encryptedData) list.add(i);
         return list;
@@ -126,7 +132,9 @@ public class Crypto {
 			if (currentByte == 0xFF) {
 
 				try {
-					output.add(new String(ArrayListToString(current_packet).getBytes("windows-1250")));
+					String toAdd = new String(ArrayListToString(current_packet).getBytes("ISO-8859-1"));
+					output.add(toAdd);
+					Crypto.addToLog("Game packet income", toAdd);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -179,6 +187,13 @@ public class Crypto {
 
 	public static String EncryptGamePacket(String buf, int session, boolean is_session_packet) {
 		//System.out.println("SEND: "+buf);
+		try {
+			buf = new String(buf.getBytes("windows-1250"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Crypto.addToLog("Game packet sent",buf);
 		int packet_length = buf.length();
 		String packet_mask = "";
 
@@ -326,5 +341,13 @@ public class Crypto {
 
 		return buf;
 	}
+    public static void addToLog(String tag,String message)
+    {
+    	String timeStamp = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").format(Calendar.getInstance().getTime());
+    	String ms =timeStamp+" "+tag.toUpperCase()+" "+message+"\n";
+    	ms.replaceAll("\n+","\n");
+    	Crypto.LOG+=ms;
+    	System.out.print(ms);
+    }
 
 }
