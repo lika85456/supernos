@@ -10,7 +10,6 @@ import java.util.*;
 public class Main {
        
 	public static void main(String[] args)throws Exception {
-        System.out.println(nostale.net.Crypto.DecryptGamePacket(nostale.net.Crypto.EncryptServerPacket("SSrdek")));
 		Resources.load();
 		Nostale n = new Nostale();
 		n.Login("Zadek512","Computer1",CServer.CZ);
@@ -42,6 +41,6 @@ public class Main {
             n.ReceiveAndParse();
             Thread.sleep(10);
 		}
-		
+		SSS
 	}
 }

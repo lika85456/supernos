@@ -11,9 +11,9 @@ import nostale.net.*;
 public class Login
 {
     //md5(nostalex.dat)+md5(nostale.dat)
-    public String HASH = "A89AAD214C1BC51EE92D5B87FD77B380C74D922D77A771261EA3B57027631922";
+    public String HASH = "41E39EC2E1A86A6E210F8309F8D4B9038C1FD039A2913E42394A7419DEE95831";
     //Version
-    public String version = "0.9.3.3074";
+    public String version = "0.9.3.3079";
     public SessionEnum sessionState = SessionEnum.NOTHING;
     //NOTHING
     //NO_INTERNET_CONNECTION
@@ -39,6 +39,7 @@ public class Login
             {
                received = c.getReceived();
             }
+            System.out.println(Crypto.DecryptLoginPacket(received));
             parseLoginPacket(Crypto.DecryptLoginPacket(received));
             c.Close();
         }
@@ -65,10 +66,12 @@ public class Login
        //N￮TeST 10543 79.110.84.41:4014:0:1.5.Ae￮o￮ 79.110.84.41:4013:0:1.4.Ae￮o￮ 79.110.84.41:4012:0:1.3.Ae￮o￮ 79.110.84.41:4011:0:1.2.Ae￮o￮ 79.110.84.41:4010:5:1.1.Ae￮o￮ -1:-1:-1:10000.10000.1
        if(!packet.contains("TeST")){this.sessionState = SessionEnum.FAIL;System.out.println(packet);}
        String[] p = packet.split(" ");
-       this.session = Integer.parseInt(p[1]);
-       parseServer(Arrays.copyOfRange(p, 2, p.length));
+       this.session = Integer.parseInt(p[2]);
+       parseServer(Arrays.copyOfRange(p, 3, p.length));
       }
-      catch(Exception e){}
+      catch(Exception e){
+    	  e.printStackTrace();
+      }
     }
 
     private void parseServer(String[] p)

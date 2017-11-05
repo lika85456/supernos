@@ -2,6 +2,7 @@ package nostale.net;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.io.UnsupportedEncodingException;
 import java.math.*;
 
 public class Crypto {
@@ -73,6 +74,12 @@ public class Crypto {
 	
     public static ArrayList<Integer> EncryptServerPacket(String str)
     {
+    	try {
+			str = new String(str.getBytes("windows-1250"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         ArrayList<Integer> StrBytes = StringToInt(str);
         int BytesLength = StrBytes.size();
 
@@ -99,42 +106,13 @@ public class Crypto {
 }
 	
 	
-	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf)
-	{
-         
-         ArrayList<String> packets = new ArrayList<String>();
-         int BytesLength = buf.size();
-         int ii=0;
-         int[] current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
-         for(int i = 0; i < BytesLength; i++)
-         {
-        	 if(buf.get(i)==0xFF)
-        	 {
-        		 current_packet[0] = 0;
-        		 packets.add(IntegerArrayToString(current_packet));
-        		 System.out.println(IntegerArrayToString(current_packet));
-        		 current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
-        		 
-        	 }
-             if (i % 0x7E == 0)
-             {
-             	if(BytesLength-i>0x7E) current_packet[i+ii]=0x7E;
-             	else continue;
-                 ii++;
-             }
-             current_packet[i+ii]= reverse_byte(buf.get(i));
-         }
-        return packets;
-        
-	}
-	
 	public static int reverse_byte(int s)
 	{
 		return 0xFF-s;
 	}
 	
 	
-	public static ArrayList<String> DecryptGamePacketTest(ArrayList<Integer> buf) {
+	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf) {
 		int len = buf.size();
 		ArrayList<String> output = new ArrayList<String>();
 		ArrayList<Integer> current_packet = new ArrayList<Integer>();
@@ -146,7 +124,13 @@ public class Crypto {
 			currentByte = buf.get(index);
 			++index;
 			if (currentByte == 0xFF) {
-				output.add(ArrayListToString(current_packet));
+
+				try {
+					output.add(new String(ArrayListToString(current_packet).getBytes("windows-1250")));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//System.out.println("RECEIVED: "+ArrayListToString(current_packet));
 				current_packet = new ArrayList<Integer>();
 				continue;
