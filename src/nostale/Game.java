@@ -23,7 +23,7 @@ public class Game
         c = new Connection();
         c.Connect(s.ip, s.port);
         c.Send(Crypto.EncryptGamePacket(packetId() + Integer.toString(this.GameData.session),this.GameData.session,true));
-        Thread.sleep(1000);
+        Thread.sleep(200);
         c.Send(Crypto.EncryptGamePacket(packetId() + this.GameData.id,this.GameData.session,false) + Crypto.EncryptGamePacket(packetId() + this.GameData.pw,this.GameData.session,false));
         parseChars();
         Timer timer = new Timer();

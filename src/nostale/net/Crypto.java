@@ -78,15 +78,11 @@ public class Crypto {
 		return temp;
 	}
 	
+	/*
     public static ArrayList<Integer> EncryptServerPacket(String str)
     {
     	Crypto.addToLog("Game packet sent",str);
-    	try {
-			//str = new String(str.getBytes("ISO-8859-1"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
         ArrayList<Integer> StrBytes = StringToInt(str);
         int BytesLength = StrBytes.size();
 
@@ -111,6 +107,7 @@ public class Crypto {
         return list;
 }
 	
+	*/
 	
 	public static int reverse_byte(int s)
 	{
@@ -187,10 +184,9 @@ public class Crypto {
 
 	public static String EncryptGamePacket(String buf, int session, boolean is_session_packet) {
 		//System.out.println("SEND: "+buf);
-		try {
-			buf = new String(buf.getBytes("windows-1250"));
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+    	try {
+			buf = new String(buf.getBytes("CP1250"));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		Crypto.addToLog("Game packet sent",buf);
@@ -230,7 +226,7 @@ public class Crypto {
 						}
 					}
 
-					output.add(buf.charAt(last_position) ^ 0xFF);
+					output.add(buf.charAt(last_position) ^ 0xFFFF); //0xFF
 				}
 			}
 
@@ -276,7 +272,7 @@ public class Crypto {
 
 					if (current_byte != 0x00) {
 						if (i % 2 == 0) {
-							output.add((current_byte << 4) & 0xFF);
+							output.add((current_byte << 4)); //output.add((current_byte << 4) & 0xFF);
 						} else {
 							int last = output.get(output.size() - 1);
 							last |= current_byte;
@@ -293,21 +289,27 @@ public class Crypto {
 		// ArrayList to String
 		String returnValue = "";
 		for (int i = 0; i < output.size(); i++) {
-			returnValue += (char) (int) output.get(i);
+			returnValue += (char)(int)output.get(i);
 
 		}
-
+    	try {
+    		//returnValue = new String(returnValue.getBytes("ISO-8859-1"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return returnValue;
 	}
 
 	private static ArrayList<Integer> completeGamePacketEncrypt(ArrayList<Integer> buf, int session,
 			boolean is_session_packet) {
-		byte session_number = (byte) (((session >> 6) & 0xFF) & 0x80000003);
+		byte session_number = (byte) (((session >> 6)) & 0x80000003);
+		//byte session_number = (byte) (((session >> 6) & 0xFF) & 0x80000003);
 
 		if (session_number < 0)
 			session_number = (byte) (((session_number - 1) | 0xFFFFFFFC) + 1);
 
-		int session_key = (session & 0xFF);
+		int session_key = (session);
+		//int session_key = (session & 0xFF);
 
 		if (is_session_packet)
 			session_number = -1;
