@@ -171,6 +171,8 @@ public class Nostale {
     	send("u_i 1 "+GameData.Character.id+" "+i.Type+" "+i.InventoryPos+" 0 0");
     }
     
+    
+    
     public void WearSP()
     {
     	send("sl 0");
@@ -178,6 +180,16 @@ public class Nostale {
     public void SPDown()
     {
     	send("sl 0");
+    }
+    
+    public void aaMob(MapMobInstance mob)
+    {
+    	this.BattleHandler.UseSkill(GameData.Character.skills[0], mob);
+    }
+    
+    public void rest()
+    {
+    	send("rest 1 1 "+GameData.Character.id);
     }
     
     public void ReceiveAndParse()

@@ -9,7 +9,7 @@ import nostale.util.Pos;
 public class BattlePacketHandler extends Handler{
     public Nostale n;
     public Skill lastSkillRequest; //last skill wich was sent to server but we dont know if was sucesfull or not :)
-    
+    public long canUse = 0;
     public BattlePacketHandler(Nostale n)
     {
         this.n = n;
@@ -18,15 +18,12 @@ public class BattlePacketHandler extends Handler{
     public void UseSkill(Skill s,MapMobInstance m)
     {
         //{CastId} {UserType} {MapMonsterId} {MapX} {MapY}
+    	if(canUse>System.currentTimeMillis()){return;}
+    	this.canUse = System.currentTimeMillis();
         this.lastSkillRequest = s;
         n.WalkHandler.Walk(Pos.getShortestPosInRange(1,m.Pos,n.GameData.Character.Pos));
         n.send("u_s "+s.CastId+" 3 "+m.id+" "+n.GameData.Character.Pos.x+" "+n.GameData.Character.Pos.y);
-        try {
-			Thread.sleep((s.CastTime*1000)-100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        canUse += s.CastTime*1000-100;
     }
     
     public void onReceive(String packet)
@@ -71,7 +68,7 @@ public class BattlePacketHandler extends Handler{
                     	  n.GameData.Mobs.remove(pac.getInt(4));
                     	  if(pac.getInt(2)==n.GameData.Character.id)// I killed it
                     	  {
-                    		  if(n.target.id == pac.getInt(4))
+                    		  if(n.target!=null && n.target.id == pac.getInt(4))
                     		  {
                                   //if i killed target, null it
                     			  n.target = null;

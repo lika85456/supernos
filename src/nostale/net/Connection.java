@@ -69,8 +69,20 @@ public class Connection{
      */
     public void Send(String packet) throws Exception
     {     
-    	outToServer.writeBytes(packet);
+
+    	//outToServer.writeBytes(packet);
+    	for(int i = 0;i<packet.length();i++)
+    	{
+    		char c = packet.charAt(i);
+    		byte first = (byte) (c>>8<<8);
+    		byte second = (byte) (c<<8>>8);
+    		outToServer.writeByte(second);
+    		//System.out.println("First: "+first+" Second: "+second);
+    	
+    	}
+
     }
+
 
     /*
      * Close the connection, optional but recommended

@@ -13,17 +13,13 @@ import java.util.*;
 public class Main {
        
 	public static void main(String[] args)throws Exception {
-    	try {
-			String tt = new String("Helèa258".getBytes("ISO-8859-1"));
-			System.out.println(tt);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
+		
 		Resources.load();
 		Nostale n = new Nostale();
 		n.Login("Zadek512","Computer1",CServer.CZ);
 		for(GameServer s:n.Login.channels)
-			if(s.channel.equals("3"))
+			if(s.channel.equals("4"))
 				n.SelectChannel(s);
 		n.SelectCharacter(n.GameData.characters[0]);
 		Thread.sleep(3000); 
@@ -39,16 +35,23 @@ public class Main {
 		    MapCharacterInstance charOnTheMap = entry.getValue();
 		    if(charOnTheMap.Name.contains("a258"))
 		    {
-		    	n.send("say Helèa258");
-		    	n.send("say "+charOnTheMap.Name);
+		    	//n.send("say "+charOnTheMap.Name);
 		    }
+		    
 		    
 
 		}
 		
+		
+		
+
+		//System.out.println(n.GameData.Character.inventory.toString());
+		
 	    while(loop)
 		{
-
+	    	if(n.target==null)
+	    	n.target = n.GetNearestMob();
+	    	n.aaMob(n.target);
             n.ReceiveAndParse();
             Thread.sleep(10);
 		}
