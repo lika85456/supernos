@@ -1,5 +1,5 @@
 package nostale.data;
-public class Item {
+public class Item{
 
     public short BasicUpgrade;
     public short CellonLvl;
@@ -70,11 +70,83 @@ public class Item {
     public short WaitDelay;
     public short WaterElement;
     public short WaterResistance;
+        
+    public Item()
+    {}
     
-    
-
-    
-
-    
-    public Item(){}
+    public Item(Item parent)
+    {
+    	if(parent==null) return;
+    			this.BasicUpgrade=parent.BasicUpgrade;
+        	    this.CellonLvl=parent.CellonLvl;
+        	    this.Class=parent.Class;
+        	    this.CloseDefence=parent.CloseDefence;
+        	    this.Color=parent.Color;
+        	    this.Concentrate=parent.Concentrate;
+        	    this.CriticalLuckRate=parent.CriticalLuckRate;
+        	    this.CriticalRate=parent.CriticalRate;
+        	    this.DamageMaximum=parent.DamageMaximum;
+        	    this.DamageMinimum=parent.DamageMinimum;
+        	    this.DarkElement=parent.DarkElement;
+        	    this.DarkResistance=parent.DarkResistance;
+        	    this.DefenceDodge=parent.DefenceDodge;
+        	    this.DistanceDefence=parent.DistanceDefence;
+        	    this.DistanceDefenceDodge=parent.DistanceDefenceDodge;
+        	    this.DurabilityPoint=parent.DurabilityPoint;
+        	    this.Effect=parent.Effect;
+        	    this.EffectValue=parent.EffectValue;
+        	    this.Element=parent.Element;
+        	    this.ElementRate=parent.ElementRate;
+        	    this.EquipmentSlot=parent.EquipmentSlot;
+        	    this.FireElement=parent.FireElement;
+        	    this.FireResistance=parent.FireResistance;
+        	    this.HitRate=parent.HitRate;
+        	    this.Hp=parent.Hp;
+        	    this.HpRegeneration=parent.HpRegeneration;
+        	    this.IsBlocked=parent.IsBlocked;
+        	    this.IsColored=parent.IsColored;
+        	    this.IsConsumable=parent.IsConsumable;
+        	    this.IsDroppable=parent.IsDroppable;
+        	    this.IsHeroic=parent.IsHeroic;
+        	    this.IsHolder=parent.IsHolder;
+        	    this.IsMinilandObject=parent.IsMinilandObject;
+        	    this.IsSoldable=parent.IsSoldable;
+        	    this.IsTradable=parent.IsTradable;
+        	    this.ItemSubType=parent.ItemSubType;
+        	    this.ItemType=parent.ItemType;
+        	    this.ItemValidTime=parent.ItemValidTime;
+        	    this.LevelJobMinimum=parent.LevelJobMinimum;
+        	    this.LevelMinimum=parent.LevelMinimum;
+        	    this.LightElement=parent.LightElement;
+        	    this.LightResistance=parent.LightResistance;
+        	    this.MagicDefence=parent.MagicDefence;
+        	    this.MaxCellon=parent.MaxCellon;
+        	    this.MaxCellonLvl=parent.MaxCellonLvl;
+        	    this.MaxElementRate=parent.MaxElementRate;
+        	    this.MaximumAmmo=parent.MaximumAmmo;
+        	    this.MoreHp=parent.MoreHp;
+        	    this.MoreMp=parent.MoreMp;
+        	    this.Morph=parent.Morph;
+        	    this.Mp=parent.Mp;
+        	    this.MpRegeneration=parent.MpRegeneration;
+        	    this.Name=parent.Name;
+        	    this.Price=parent.Price;
+        	    this.PvpDefence=parent.PvpDefence;
+        	    this.PvpStrength=parent.PvpStrength;
+        	    this.ReduceOposantResistance=parent.ReduceOposantResistance;
+        	    this.ReputationMinimum=parent.ReputationMinimum;
+        	    this.ReputPrice=parent.ReputPrice;
+        	    this.SecondaryElement=parent.SecondaryElement;
+        	    this.Sex=parent.Sex;
+        	    this.Speed=parent.Speed;
+        	    this.SpType=parent.SpType;
+        	    this.Type=parent.Type;
+        	    this.VNUM=parent.VNUM;
+        	    this.NameID=parent.NameID;
+        	    this.WaitDelay=parent.WaitDelay;
+        	    this.WaterElement=parent.WaterElement;
+        	    this.WaterResistance=parent.WaterResistance;
+    	
+    	
+    }
 }

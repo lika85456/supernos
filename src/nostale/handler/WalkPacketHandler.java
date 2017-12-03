@@ -1,39 +1,58 @@
 package nostale.handler;
-import nostale.Nostale;
+import nostale.data.Player;
 import nostale.util.Pos;
 public class WalkPacketHandler extends Handler{
-    public Nostale n;
+	public Player player;
     
-    public WalkPacketHandler(Nostale n)
+    public WalkPacketHandler(Player player)
     {
-        this.n = n;
+    	this.player = player;
     }
     
     public void Walk(Pos p)
     {
-    	n.GameData.Character.IsMoving = true;
-        this.Walk(p.x,p.y);
-        n.GameData.Character.IsMoving = false;
+    	
+        this.Walk(Pos.getPath(player.gameData.map[player.gameDataMapID], player.pos, p),0);
     }
 
-    private void Walk(int x,int y)
+    private void Walk(Pos[] path,int index)
     {
+    	if(index>=path.length)
+    	{
+    		player.IsMoving = false;
+    		return;
+    	}
+
+        	player.IsMoving = true;
+        	player.send("walk "+path[index].x+" "+path[index].y+" 0 "+player.Speed);
+        	index++;
+        	final int i = index;
+        	int timeToWait = (1000/player.Speed);
+        	new java.util.Timer().schedule( 
+        	        new java.util.TimerTask() {
+        	            @Override
+        	            public void run() {
+        	                Walk(path,i);
+        	            }
+        	        }, 
+        	        timeToWait 
+        	);
+
     	
-        if(n.GameData.map.canWalkHere(x,y))
+/*    	if(player.IsMoving==true) return;
+        if(player.gameData.map[player.gameDataMapID].canWalkHere(x,y))
         {
-           if(Pos.getRange(new Pos(x,y),n.GameData.Character.Pos)>10)
+           if(Pos.getRange(new Pos(x,y),player.pos)>10)
            {
-               Pos[] walkTo = Pos.getPath(n.GameData.Character.Pos,new Pos(x,y));
+               Pos[] walkTo = Pos.getPath(player.gameData.map[player.gameDataMapID],player.pos,new Pos(x,y));
                for(Pos toWalk: walkTo)
                {
-            	   double t = (1000*Pos.getRange(n.GameData.Character.Pos,new Pos(x,y))/n.GameData.Character.Speed);
+            	   double t = (1000*Pos.getRange(player.pos,new Pos(x,y))/player.Speed);
             	   int toSleep = (int)(t);
             	   if(toSleep==0){return;}
-            	   n.send("walk "+toWalk.x+" "+toWalk.y+" 0 "+n.GameData.Character.Speed);
+            	   player.send("walk "+toWalk.x+" "+toWalk.y+" 0 "+player.Speed);
             	   try {
-					Thread.sleep(toSleep);
-					
-					n.GameData.Character.Pos = toWalk;
+					player.pos = toWalk;
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -56,6 +75,8 @@ public class WalkPacketHandler extends Handler{
 			} 
            }
         }
+        //player.IsMoving = false;
+         */
     }
  
 }

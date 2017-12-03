@@ -1,11 +1,10 @@
 package nostale.net;
-import java.security.*;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.io.UnsupportedEncodingException;
-import java.math.*;
 
 public class Crypto {
 	public static String LOG="";
@@ -131,6 +130,7 @@ public class Crypto {
 				try {//ISO-8859-1
 					String toAdd = new String(ArrayListToString(current_packet).getBytes("ISO-8859-1"));
 					output.add(toAdd);
+					if(!toAdd.contains("mv") && !toAdd.contains("st"))
 					Crypto.addToLog("Game packet income", toAdd);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
@@ -182,15 +182,29 @@ public class Crypto {
 		return output;
 	}
 
-	public static String EncryptGamePacket(String buf, int session, boolean is_session_packet) {
+	public static String EncryptGamePacket(String buff, int session, boolean is_session_packet) {
 		//System.out.println("SEND: "+buf);
-		Crypto.addToLog("Game packet sent",buf);
+		Crypto.addToLog("Game packet sent",buff);
+		//try {
+		//	buf = new String(buf.getBytes("UTF-8"));
+		//} catch (UnsupportedEncodingException e) {
+		//	// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
 		
+		byte[] buf = new byte[1];
+		try {
+			buf = null;
+			buf = buff.getBytes("windows-1250");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		int packet_length = buf.length();
+		int packet_length = buf.length;
 		String packet_mask="";
-		for (int i = 0; i < buf.length(); i++) {
-			char c = (char) buf.charAt(i);
+		for (int i = 0; i < buf.length; i++) {
+			char c = (char) buf[i];
 			if (c == '#')
 				packet_mask += '0';
 			else if (0 == (c -= 0x20) || (c += 0xF1) < 0 || (c -= 0xB) < 0 || 0 == (c -= 0xC5))
@@ -229,7 +243,7 @@ public class Crypto {
 						}
 					}
 
-					output.add(output.size(),(char)(buf.charAt(last_position) ^ 0xFFFF));
+					output.add(output.size(),(char)(buf[last_position] ^ 0xFF));
 				}
 			}
 
@@ -259,7 +273,7 @@ public class Crypto {
 						}
 					}
 
-					current_byte = buf.charAt(last_position); 
+					current_byte = (char)buf[last_position]; 
 					switch(current_byte)
 					{
 					case 0x20:

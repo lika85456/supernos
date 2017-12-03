@@ -6,4 +6,5 @@ public class MapMobInstance extends Mob{
 	public int id;
     public short MapId;
     public Pos Pos;
+
 }

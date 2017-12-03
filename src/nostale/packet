@@ -13,3 +13,9 @@ su 1 {Session.Character.CharacterId} 1 {Session.Character.CharacterId} {ski.Skil
 su 1 {Session.Character.CharacterId} 1 {targetId} {ski.Skill.SkillVNum} {ski.Skill.Cooldown} {ski.Skill.AttackAnimation} {ski.Skill.Effect} {Session.Character.PositionX} {Session.Character.PositionY} 1 {((int)((double)Session.Character.Hp / Session.Character.HPLoad()) * 100)} 0 -1 {ski.Skill.SkillType - 1}
 ct 1 {Session.Character.CharacterId} 1 {Session.Character.CharacterId} {ski.Skill.CastAnimation} {ski.Skill.CastEffect} {ski.Skill.SkillVNum}
 sr {castingId} - restart skill cooldown
+
+req_exc 1 374541 - požádání o request
+dlg #req_exc^2^351883 #req_exc^5^351883 Pøijmout smìnu od Helèa258? - request income
+#req_exc^2^351883 = prijmout
+#req_exc^5^351883 = odmitnout
+exc_list 1 351883 -1 - vymena prijata

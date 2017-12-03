@@ -1,89 +1,53 @@
 package nostale;
 
-import nostale.net.Connection;
-import nostale.net.Crypto;
-import nostale.resources.LoadItems;
-import nostale.resources.LoadMobs;
-import nostale.resources.LoadSkills;
-import nostale.resources.Resources;
-import nostale.util.Pos;
-import nostale.data.MapCharacterInstance;
-import nostale.data.GameData;
-import nostale.data.InventoryItemInstance;
-import nostale.data.MapItemInstance;
-import nostale.data.MapMobInstance;
-import nostale.data.Mob;
-import nostale.data.Portal;
-import nostale.data.Skill;
-import nostale.handler.BattlePacketHandler;
-import nostale.handler.WalkPacketHandler;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 
-import nostale.Game;
-import nostale.GameServer;
+import nostale.data.GameData;
+import nostale.data.LoginData;
+import nostale.data.Player;
+import nostale.resources.Resources;
 
 public class Nostale {
-    public Login Login;
-    public Game Game;
-    public Connection c;
-    public GameData GameData;
-    public MapMobInstance target;
-    public BattlePacketHandler BattleHandler;
-    public WalkPacketHandler WalkHandler;
+	public Login Login;
 
-    
+    public ArrayList<Player> players;
+    public GameData GameData;
+   
     public Nostale()
     {
-	//Handler initialisation
-	BattleHandler = new BattlePacketHandler(this);
-	WalkHandler = new WalkPacketHandler(this);
+    	this.GameData = new GameData();
+    	players = new ArrayList<Player>();
 	    
     	try
     	{
         System.out.println("Loading resources");
-
-        Resources.skills = LoadSkills.loadSkills();
-        Resources.items = LoadItems.loadItems();
-        Resources.mobs = LoadMobs.loadMobs(Resources.items);
+        Resources.load();
         System.out.println("Loading done!");
     	}
     	catch(Exception e){e.printStackTrace();}
     }
-    public void Login(String nickname,String password,CServer s)
+    
+    
+    public int addPlayer(LoginData data)
     {
-    	this.Login = new Login(nickname,password,s);
-    	if(this.Login.sessionState!=SessionEnum.NOTHING)
-    		System.out.println("Error: "+this.Login.sessionState);
-    	//TODO Loading resources by country
-    	
-    	
+    	Player p  =new Player(data,GameData);
+    	players.add(p);
+    	return players.indexOf(p);
     }
     
-    public void SelectChannel(GameServer s)
+    public void parse()
     {
-    	try
+    	for(Player p:players)
     	{
-    		Game = new Game();
-    		Game.GameData.id = Login.id;
-    		Game.GameData.pw = Login.pw;
-    		Game.GameData.session = Login.session;
-    		Game.Connect(s);
-    		this.c = Game.c;
-    		this.GameData = Game.GameData;
-    	}
-    	catch(Exception e)
-    	{
-		e.printStackTrace();
+    		p.ReceiveAndParse();
     	}
     }
-
+    
+    /*
     public void SelectCharacter(MapCharacterInstance ch)
     {
     	try{
-    		Game.selectChar(ch);	
+    		Login.selectChar(ch);	
     	}
     	catch(Exception e)
     	{
@@ -96,7 +60,7 @@ public class Nostale {
     {
     	
     	try{
-    		Game.send(packet);
+    		Login.send(packet);
     	}
     	catch(Exception e){e.printStackTrace();}
     	
@@ -209,12 +173,12 @@ public class Nostale {
     			}
                 break;
                 
-                /*case "sc":
+                //case "sc":
                  //sc {type} {weaponUpgrade} {MinHit} {MaxHit} {HitRate} {HitCriticalRate} {HitCritical} {type2} {secondaryUpgrade} {MinDistance} {MaxDistance} {DistanceRate} {DistanceCriticalRate} {DistanceCritical} {armorUpgrade} {Defence} {DefenceRate} {DistanceDefence} {DistanceDefenceRate} {MagicalDefence} {FireResistance} {WaterResistance} {LightResistance} {DarkResistance}
-                GameData.Character.maxDistance = Integer.parseInt(pac[11]);
+                //GameData.Character.maxDistance = Integer.parseInt(pac[11]);
                 
-                break;
-                */
+                //break;
+                
                 
                 case "lev":
                 //lev {Level} {LevelXp} {JobLevel} {JobXP} {XPLoad()} {JobLoad} {Reput} {GetCP()} {HeroXp} {HeroLevel} {HeroXPLoad()}";
@@ -448,16 +412,17 @@ public class Nostale {
                 
                 
                 //Nosbasar..
-                /*case "rc_blist":
-                   this.nb.parse(packet);
-                break;
-                case "rc_buy":
-                   this.nb.parse(packet);
-                break;
-                */
+                //case "rc_blist":
+                //   this.nb.parse(packet);
+                //break;
+                //case "rc_buy":
+                 //  this.nb.parse(packet);
+                //break;
+
         	}
         	
     	}
 
     }
+    */
 }

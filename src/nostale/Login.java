@@ -1,7 +1,14 @@
 package nostale;
 
-import java.util.*;
-import nostale.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import nostale.data.Character;
+import nostale.data.ClassType;
+import nostale.net.Connection;
+import nostale.net.Crypto;
 /**
  * Write a description of class Login here.
  *
@@ -23,7 +30,17 @@ public class Login
     public String id = "";
     public String pw = "";
     public Connection c;
+    public int packetId = 240;
     public Boolean parse = false;
+    public int time = 0;
+    public Character[] characters;
+    
+    /***
+     * First of all we need to connect to server with some data
+     * @param nickname
+     * @param password
+     * @param se
+     */
     public Login(String nickname, String password, CServer se)
     {
         this.id = nickname;
@@ -41,6 +58,9 @@ public class Login
             }
             parseLoginPacket(Crypto.DecryptLoginPacket(received));
             c.Close();
+            
+
+            
         }
         catch(Exception e)
         {
@@ -50,6 +70,44 @@ public class Login
         
        
     }
+    
+    public void SelectServer(GameServer s)
+    {
+        c = new Connection();
+        try
+        {
+
+        c.Connect(s.ip, s.port);
+        c.Send(Crypto.EncryptGamePacket(packetId() + Integer.toString(this.session),this.session,true));
+        Thread.sleep(200);
+        c.Send(Crypto.EncryptGamePacket(packetId() + this.id,this.session,false) + Crypto.EncryptGamePacket(packetId() + this.pw,this.session,false));
+        parseChars();
+        Timer timer = new Timer();
+
+        timer.schedule( new TimerTask() {
+            public void run() {
+                time+=60;
+                try {
+					send("pulse "+time+" 0");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+            }
+         }, 60*1000, 60*1000);
+    	
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
+    }
+    
+    private String packetId()
+    {
+      this.packetId++;
+      return this.packetId+" ";
+    }
+    
     private String makeLoginPacket(String id,String pw)throws Exception
     {
        String login_packet = "";
@@ -83,6 +141,107 @@ public class Login
        rray.remove(rray.size()-1);
        this.channels = rray.toArray(new GameServer[0]);
     }
+    
+    
+    public void selectChar(Character ch)
+    {
+
+    	try{
+    		
+
+        send("select "+ch.Slot);
+        parse = true;
+        Boolean s = true;
+        while(s==true)
+        {
+             String[] received = c.GetReceived();
+             for(String rec:received)
+             {
+
+                if(rec.contains("OK"))
+                {
+                  send("game_start");
+                  send("lbs 0");
+                  s=false;
+                }
+              }
+             Thread.sleep(5);      
+        }
+
+    	}
+    	catch(Exception e){
+    		
+    	}
+    }
+    
+    private void parseChars() throws Exception
+    {
+        String lastPacket = "";
+        ArrayList<Character> tempChars = new ArrayList<Character>();
+        while(!lastPacket.contains("clist_end"))
+        {
+          String[] received = c.GetReceived();
+          for(String rec:received)
+          {
+             lastPacket = rec;
+
+             //System.out.println(":"+parsePacket(rec)[0]+":"+(parsePacket(rec)[0]=="clist"));
+             //System.out.println(":"+parsePacket(rec)[0]+":");
+             if(parsePacket(rec)[0].equals("clist"))
+             {
+                tempChars.add(parseChar(rec));
+             }
+          }
+        } 
+        send("c_close");
+        send("f_stash_end");
+        this.characters = tempChars.toArray(new Character[0]);
+    
+    }
+        
+    private Character parseChar(String pa)
+    {
+       Character chara = new Character();
+       String[] p = parsePacket(pa);
+       chara.Slot = (byte)Integer.parseInt(p[1]);
+       chara.Name = p[2];
+       chara.Class = ClassType.get(Integer.parseInt(p[8]));
+       chara.Level = (byte)Integer.parseInt(p[9]);
+       chara.JobLevel = (byte)Integer.parseInt(p[12]);
+
+       return chara;
+    }
+    
+    private String[] parsePacket(String packet)
+    {
+       return packet.split(" ");
+    }
+    
+    public void send(String s) throws Exception
+    {
+    	c.Send(Crypto.EncryptGamePacket(packetId()+s,this.session,false));
+    }
+    public void sendAfterWait(String s,int time) throws Exception
+    {
+
+    	new java.util.Timer().schedule( 
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                	try {
+						c.Send(Crypto.EncryptGamePacket(packetId()+s,session,false));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                }
+            }, 
+            time 
+    );
+    
+    }
+    
+    
 
 }
 /*

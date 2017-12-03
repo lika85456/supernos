@@ -1,7 +1,8 @@
 package nostale.util;
 
+import java.util.List;
+
 import nostale.resources.Map;
-import java.util.ArrayList;
 public class Pos
 {
     public short x;
@@ -73,16 +74,24 @@ public class Pos
     	return new Pos(character.x+((int)((mob.x-character.x)*(r-range)/r)),character.y+((int)((mob.y-character.y)*(r-range)/r)));
     }
 
-    public static Pos[] getPath(Pos p1, Pos p2)
+    public static Pos[] getPath(nostale.resources.Map m,Pos p1, Pos p2)
     {
-        ArrayList<Pos> p = new ArrayList<Pos>();
-        int range = Pos.getRange(p1,p2);
-        while(true)
-        {
-           p.add(Pos.getShortestPosInRange(range-8,p2,p1));
-           range -= 8;
-           if(range<0) return p.toArray(new Pos[0]);
-        }
+    	nostale.util.Map<ExampleNode> map = new nostale.util.Map<ExampleNode>(m.width,m.height,new ExampleFactory());
+    	for(int x = 0;x<m.width;x++)
+    	{
+    		for(int y = 0;y<m.height;y++)
+    		{
+    			map.setWalkable(x, y, m.canWalkHere(x, y));
+    		}
+    	}
+    	List<ExampleNode> list = map.findPath(p1.x, p1.y, p2.x, p2.y);
+    	//map.drawMap();
+    	Pos[] toReturn = new Pos[list.size()];
+    	for(int i = 0;i<list.size();i++)
+    	{
+    		toReturn[i] = new Pos(list.get(i).getxPosition(),list.get(i).getyPosition());
+    	}
+    	return toReturn;
     }
     
     

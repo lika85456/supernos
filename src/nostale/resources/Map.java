@@ -1,5 +1,10 @@
 package nostale.resources;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 public class Map
 {
@@ -11,7 +16,8 @@ public class Map
     public int width,height;
     public String Name="";
     public Boolean[] posi;
-    public Map(int id) throws Exception
+    public Map(){}
+    public void load(int id) throws Exception
     {
     this.id = id;
     String line;

@@ -5,4 +5,5 @@ public class MapItemInstance extends Item{
     public nostale.util.Pos Pos;
     public int Amount;
     public int OwnerID;
+
 }

@@ -5,7 +5,8 @@ public class InventoryItemInstance extends Item{
     public byte Amount;
     public InventoryItemInstance(Item i)
     {
-       try{ this.BasicUpgrade = i.BasicUpgrade;} catch(Exception e){}
+    	super(i);
+       /*try{ this.BasicUpgrade = i.BasicUpgrade;} catch(Exception e){}
        try{ this.CellonLvl = i.CellonLvl;} catch(Exception e){}
        try{ this.Class = i.Class;} catch(Exception e){}
        try{ this.CloseDefence = i.CloseDefence;} catch(Exception e){}
@@ -75,6 +76,7 @@ public class InventoryItemInstance extends Item{
        try{ this.WaitDelay = i.WaitDelay;} catch(Exception e){}
        try{ this.WaterElement = i.WaterElement;} catch(Exception e){}
        try{ this.WaterResistance = i.WaterResistance;} catch(Exception e){}
+       */
         
     }
 }

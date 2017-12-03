@@ -1,5 +1,6 @@
 package nostale.resources;
 import nostale.data.Item;
+import nostale.data.MapMobInstance;
 import nostale.data.Mob;
 import nostale.data.Skill;
 
@@ -14,7 +15,12 @@ public class Resources
     public static Mob[] mobs;
     public static Boolean loaded = false;
     
-    //TODO, make more findXById funcs
+
+    public static MapMobInstance fill(MapMobInstance m)
+    {
+    	return (MapMobInstance)m;
+    }
+    
     public static Mob getMobByVNUM(int id)
     {
        for(int i = 0;i<Resources.mobs.length;i++)

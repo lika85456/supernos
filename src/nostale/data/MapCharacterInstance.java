@@ -3,11 +3,9 @@ package nostale.data;
 import nostale.util.Pos;
 
 public class MapCharacterInstance extends Character{
-    public Pos Pos;
+    public Pos pos;
     public long id;
-    public Inventory inventory;
     public MapCharacterInstance()
     {
-    	inventory = new Inventory();
     }
 }

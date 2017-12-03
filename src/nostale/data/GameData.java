@@ -1,18 +1,21 @@
 package nostale.data;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import nostale.resources.MapInstance;
 public class GameData {
-    public String id = "";
-    public String pw = "";
-    public MapCharacterInstance[] characters;
-    public int session = 0;
-    public MapCharacterInstance Character;
+    public MapInstance[] map;
+    public GameData(){
+    	this.map = new MapInstance[1];
+    }
     
-    public nostale.resources.Map map;
-    
-    public HashMap<Integer, MapCharacterInstance> Characters = new HashMap<Integer, MapCharacterInstance>();
-    public HashMap<Integer, Portal> Portals = new HashMap<Integer, Portal>();
-    public HashMap<Integer, MapMobInstance> Mobs = new HashMap<Integer, MapMobInstance>();
-    public HashMap<Integer, MapItemInstance> Items = new HashMap<Integer, MapItemInstance>();
-    public HashMap<Integer, MapCharacterInstance> Players = new HashMap<Integer, MapCharacterInstance>();
-    public GameData(){}
+    //Adds map into the array
+    public int addMap(MapInstance m)
+    {
+    	ArrayList<nostale.resources.MapInstance> tempAL = new ArrayList<nostale.resources.MapInstance>(Arrays.asList(this.map));
+    	tempAL.add(m);
+    	this.map = tempAL.toArray(new MapInstance[0]);
+    	int id = tempAL.indexOf(m);
+    	return id;
+    }
 }
