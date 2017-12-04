@@ -2,11 +2,11 @@ package nostale.handler;
 import nostale.data.Player;
 import nostale.util.Pos;
 public class WalkPacketHandler extends Handler{
-	public Player player;
+
     
     public WalkPacketHandler(Player player)
     {
-    	this.player = player;
+    	super(player);
     }
     
     public void Walk(Pos p)

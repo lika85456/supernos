@@ -7,12 +7,11 @@ import nostale.data.Skill;
 import nostale.util.Pos;
 
 public class BattlePacketHandler extends Handler{
-    public Player player;
     public Skill lastSkillRequest; //last skill wich was sent to server but we dont know if was sucesfull or not :)
     public long canUse = 0;
     public BattlePacketHandler(Player player)
     {
-        this.player = player;
+        super(player);
     }
     
     public void UseSkill(Skill s,MapMobInstance m)
