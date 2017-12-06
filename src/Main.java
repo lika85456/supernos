@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -16,10 +19,67 @@ public class Main {
 	public static Thread consoleReader;
 	public static Boolean consoleReaderRead = true;
 	public static Nostale nostale;
+	public static LoginData brgeoghad;
+	public static LoginData NostaleJackpotData;
+	public static Player jackpotBot;
+	public static Player banka;
+	
+	public static Boolean stateStart=false;
+	public static Boolean succesfullyEnd = false;
+	
 	public static void consoleReaderMethodToRun()
 	{
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String read="";
 		while(consoleReaderRead)
 		{
+			try {
+				read = reader.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(read.contains("start"))
+			{
+				stateStart=true;
+				System.out.println("Starting");
+			}
+			else if(read.contains("restart"))
+			{
+				if(stateStart==true)
+				{
+					stateStart = false;
+					while(succesfullyEnd==false)
+					{
+						try {
+							consoleReader.sleep(10);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					main(null);
+					succesfullyEnd = false;
+					stateStart = true;
+					System.out.println("Restarted");
+				}
+				else
+				{
+					System.out.println("Havent started yet. So cannot restart");
+				}
+			}
+			else if(read.contains("stop"))
+			{
+				stateStart = false;
+				System.out.println("Stopping");
+			}
+			else if(read.contains("info"))
+			{
+				System.out.println("*********INFO*********");
+				System.out.println("***Money: "+banka.Gold);
+			}	
+			
 		}
 	}
 	
@@ -35,14 +95,14 @@ public class Main {
 		// Table accounts = new Table(new ArrayList<String[]>());
 
 		nostale = new Nostale();
-		LoginData brgeoghad = new LoginData();
+		brgeoghad = new LoginData();
 		brgeoghad.nickname = "Zadek512";
 		brgeoghad.password = "Computer1";
 		brgeoghad.channel = 5;
 		brgeoghad.server = 1;
 		brgeoghad.country = CServer.CZ;
 
-		LoginData NostaleJackpotData = new LoginData();
+		NostaleJackpotData = new LoginData();
 		// nostaleJackpot@post.cz Computer1
 		NostaleJackpotData.nickname = "NostaleJackpot58";
 		NostaleJackpotData.password = "951852QwErTy";
@@ -50,8 +110,17 @@ public class Main {
 		NostaleJackpotData.server = 1;
 		NostaleJackpotData.country = CServer.CZ;
 
-		Player jackpotBot = nostale.players.get(nostale.addPlayer(NostaleJackpotData));
-		Player banka = nostale.players.get(nostale.addPlayer(brgeoghad));
+		while(stateStart==false)
+		{
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		jackpotBot = nostale.players.get(nostale.addPlayer(NostaleJackpotData));
+		banka = nostale.players.get(nostale.addPlayer(brgeoghad));
 		nostale.parse();
 		try {
 			Thread.sleep(1000);
@@ -82,7 +151,7 @@ public class Main {
 		Boolean toSay = false;
 		Trade bankTrade = null;
 
-		while (true) {
+		while (stateStart) {
 			
 			jackpotBotTrade = jackpotBot.tradeHandler.trade;
 			if (toSay != true && timeNow - lastTimeNewRound > 5000) {
@@ -237,7 +306,33 @@ public class Main {
 
 			
 			int moneyInBank = jackpot.getPlayersMoney((int)banka.id);
-			
+			if(moneyInBank>0)
+			{
+				bankTrade = banka.tradeHandler.trade;
+				if(bankTrade==null)
+				{
+						banka.tradeHandler.newRequest((int)jackpotBot.id);
+						bankTrade = banka.tradeHandler.trade;
+						bankTrade.MyStatus = 1;
+				}
+				else if(bankTrade!=null && bankTrade.MyStatus!=10)
+				{
+					if(bankTrade.OponentStatus==1 && bankTrade.MyStatus==1)
+					{
+						bankTrade.give(0);
+					}
+					else if(bankTrade.OponentStatus==2)
+					{
+						bankTrade.acceptTrade();
+						jackpot.setPlayersMoney((int)banka.id, moneyInBank);
+						banka.tradeHandler.trade.MyStatus = 10;
+					}
+				}
+
+
+				
+				
+			}
 			
 
 
@@ -264,13 +359,20 @@ public class Main {
 			}
 			
 		}
+		
+		for(Player p:nostale.players)
+		{
+			try {
+				p.login.c.Close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		// Admin control. map control, basar selling
 
 	}
-    public void run() {
-        System.out.println("Hello from a thread!");
-    }
 
 }
 
