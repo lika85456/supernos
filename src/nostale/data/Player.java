@@ -12,7 +12,6 @@ import nostale.handler.NosbasarHandler;
 import nostale.handler.TradeRequestHandler;
 import nostale.handler.WalkPacketHandler;
 import nostale.resources.Map;
-import nostale.resources.MapInstance;
 import nostale.resources.Resources;
 import nostale.util.Pos;
 
@@ -176,7 +175,7 @@ public class Player extends MapCharacterInstance{
         	case "c_map":
                 try {
                 	
-                	MapInstance temp = new nostale.resources.MapInstance();
+                	MapInstance temp = new nostale.data.MapInstance();
                 	temp.load(pac.getInt(2));
                 	this.gameDataMapID = this.gameData.addMap(temp);
     			} catch (Exception e1) {

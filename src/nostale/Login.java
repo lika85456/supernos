@@ -34,7 +34,8 @@ public class Login
     public Boolean parse = false;
     public int time = 0;
     public Character[] characters;
-    
+    public Timer t;
+    public TimerTask tt;
     /***
      * First of all we need to connect to server with some data
      * @param nickname
@@ -84,16 +85,21 @@ public class Login
         parseChars();
         Timer timer = new Timer();
 
-        timer.schedule( new TimerTask() {
+        t = new Timer();
+        tt = new TimerTask() {
+            @Override
             public void run() {
-                time+=60;
+            	time+=60;
                 try {
 					send("pulse "+time+" 0");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-            }
-         }, 60*1000, 60*1000);
+
+            };
+        };
+        
+        t.schedule(tt,60000,60000);
     	
         }
         catch(Exception e)

@@ -1,8 +1,6 @@
 package nostale.data;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import nostale.resources.MapInstance;
 public class GameData {
     public MapInstance[] map;
     public GameData(){
@@ -12,7 +10,7 @@ public class GameData {
     //Adds map into the array
     public int addMap(MapInstance m)
     {
-    	ArrayList<nostale.resources.MapInstance> tempAL = new ArrayList<nostale.resources.MapInstance>(Arrays.asList(this.map));
+    	ArrayList<nostale.data.MapInstance> tempAL = new ArrayList<nostale.data.MapInstance>(Arrays.asList(this.map));
     	tempAL.add(m);
     	this.map = tempAL.toArray(new MapInstance[0]);
     	int id = tempAL.indexOf(m);

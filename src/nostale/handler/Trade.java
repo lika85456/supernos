@@ -16,7 +16,7 @@ public class Trade {
 	public int goldFromPlayer;
 	public int playerID;
 	public Player player;
-	
+	public int moneyGiven = 0;
 	public byte MyStatus = 0;
 	public byte OponentStatus = 0;
 	public Trade(Player player)
@@ -85,6 +85,7 @@ public class Trade {
 	public void give(int gold)
 	{
 		executeList(gold);
+		moneyGiven = gold;
 		log("Giving to player: "+gold+" gold");
 	}
 	

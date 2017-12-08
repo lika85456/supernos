@@ -23,8 +23,13 @@ public class Log {
 		if(logCall>callsToSave)
 		{
 			logCall = 0;
-			Database.save("log",Database.load("log")+Log.log);
+			save();
 		}
+	}
+	
+	public static void save()
+	{
+		Database.save("log",Database.load("log")+Log.log);
 	}
 	
 	public static String getCurrentTimeStamp() {

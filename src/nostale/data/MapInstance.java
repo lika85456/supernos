@@ -1,11 +1,8 @@
-package nostale.resources;
+package nostale.data;
 
 import java.util.HashMap;
 
-import nostale.data.MapCharacterInstance;
-import nostale.data.MapItemInstance;
-import nostale.data.MapMobInstance;
-import nostale.data.Portal;
+import nostale.resources.Map;
 
 public class MapInstance extends nostale.resources.Map{
     public HashMap<Integer, Portal> Portals = new HashMap<Integer, Portal>();

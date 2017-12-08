@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,9 +24,12 @@ public class Main {
 	public static LoginData NostaleJackpotData;
 	public static Player jackpotBot;
 	public static Player banka;
-	
+	public static Jackpot jackpot;
 	public static Boolean stateStart=false;
 	public static Boolean succesfullyEnd = false;
+	
+	public static HashMap<Integer,Long> blacklist;
+	
 	
 	public static void consoleReaderMethodToRun()
 	{
@@ -53,7 +57,7 @@ public class Main {
 					while(succesfullyEnd==false)
 					{
 						try {
-							consoleReader.sleep(10);
+							Thread.sleep(10);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -79,11 +83,20 @@ public class Main {
 				System.out.println("*********INFO*********");
 				System.out.println("***Money: "+banka.Gold);
 			}	
+			else if(read.contains("save"))
+			{
+				jackpot.save();
+			}
+			else if(read.contains("say"))
+			{
+				jackpotBot.send(read);
+			}
 			
 		}
 	}
 	
 	public static void main(String[] args) {
+		blacklist = new HashMap<Integer,Long>();
 		consoleReader = new Thread(new Runnable() {
 		public void run()
 		{
@@ -98,7 +111,7 @@ public class Main {
 		brgeoghad = new LoginData();
 		brgeoghad.nickname = "Zadek512";
 		brgeoghad.password = "Computer1";
-		brgeoghad.channel = 5;
+		brgeoghad.channel = 3;
 		brgeoghad.server = 1;
 		brgeoghad.country = CServer.CZ;
 
@@ -106,7 +119,7 @@ public class Main {
 		// nostaleJackpot@post.cz Computer1
 		NostaleJackpotData.nickname = "NostaleJackpot58";
 		NostaleJackpotData.password = "951852QwErTy";
-		NostaleJackpotData.channel = 5;
+		NostaleJackpotData.channel = 3;
 		NostaleJackpotData.server = 1;
 		NostaleJackpotData.country = CServer.CZ;
 
@@ -115,7 +128,6 @@ public class Main {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -125,7 +137,6 @@ public class Main {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		nostale.parse();
@@ -134,7 +145,6 @@ public class Main {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -143,13 +153,14 @@ public class Main {
 		jackpotBot.tradeHandler.acceptRequests = true;
 		Trade jackpotBotTrade = jackpotBot.tradeHandler.trade;
 
-		Jackpot jackpot = new Jackpot();
+		jackpot = new Jackpot();
 		jackpot.newRound();
 
 		long lastTimeNewRound = 0;
 		long timeNow = System.currentTimeMillis();
 		Boolean toSay = false;
 		Trade bankTrade = null;
+		int roundWarnedForAdmin=-1;
 
 		while (stateStart) {
 			
@@ -257,11 +268,28 @@ public class Main {
 			if(jackpotBotTrade!=null && jackpotBotTrade.MyStatus==0 && jackpotBotTrade.OponentStatus==0)
 			{
 				//TODO check if this guy isnt in blacklist
+				Boolean isBlacklisted = false;
+				try
+				{
+					Long l = blacklist.get(jackpotBotTrade.playerID);
+					if(l>0) isBlacklisted = true;
+					if(l<System.currentTimeMillis()-10000)
+					{
+						blacklist.remove(jackpotBotTrade.playerID);
+						isBlacklisted = false;
+					}
+				}
+				catch(Exception e)
+				{
+					
+				}
+				if(isBlacklisted==false)
 				jackpotBotTrade.acceptRequest();
+				blacklist.put(jackpotBotTrade.playerID, System.currentTimeMillis());
 			}
 			if(jackpotBotTrade!=null)
 			{
-				if(jackpotBotTrade.MyStatus==10 || jackpotBotTrade.MyStatus>3 && jackpotBotTrade.OponentStatus>3)
+				if(jackpotBotTrade.MyStatus==10 || jackpotBotTrade.MyStatus>3 || jackpotBotTrade.OponentStatus>3)
 				{
 					jackpotBot.tradeHandler.trade = null;
 				}
@@ -281,14 +309,13 @@ public class Main {
 						}
 						
 						if(playersMoneyInDB>0)
+						{
 							jackpotBotTrade.give(playersMoneyInDB);
+							
+						}
 						else
 							jackpotBotTrade.give(0);
 						jackpotBotTrade.acceptTrade();
-						if(moneyHeSet>0)
-						{
-							jackpot.bet(jackpotBotTrade.playerID, moneyHeSet);
-						}
 					}
 					
 					if(jackpotBotTrade.OponentStatus==3)
@@ -296,6 +323,14 @@ public class Main {
 						if(jackpotBotTrade.MyStatus!=3)
 						jackpotBotTrade.acceptTrade();
 						jackpotBotTrade.MyStatus = 10;
+						jackpot.setPlayersMoney(jackpotBotTrade.playerID,jackpot.getPlayersMoney(jackpotBotTrade.playerID)-jackpotBotTrade.moneyGiven);
+						int moneyHeSet = jackpotBotTrade.goldFromPlayer;
+						if(moneyHeSet>0)
+						{
+							jackpot.bet(jackpotBotTrade.playerID, moneyHeSet);
+							jackpotBot.send("say "+jackpotBot.gameData.map[jackpotBot.gameDataMapID].Players.get(jackpotBotTrade.playerID).Name+" právì vsadil "+moneyHeSet);
+						}
+						
 					}
 				}
 
@@ -306,10 +341,8 @@ public class Main {
 
 			
 			int moneyInBank = jackpot.getPlayersMoney((int)banka.id);
-			if(moneyInBank>0)
-			{
 				bankTrade = banka.tradeHandler.trade;
-				if(bankTrade==null)
+				if(bankTrade==null || bankTrade.MyStatus==10 && moneyInBank>0)
 				{
 						banka.tradeHandler.newRequest((int)jackpotBot.id);
 						bankTrade = banka.tradeHandler.trade;
@@ -324,25 +357,32 @@ public class Main {
 					else if(bankTrade.OponentStatus==2)
 					{
 						bankTrade.acceptTrade();
-						jackpot.setPlayersMoney((int)banka.id, moneyInBank);
 						banka.tradeHandler.trade.MyStatus = 10;
 					}
 				}
 
 
-				
-				
-			}
+			
 			
 
 
 			    for (Map.Entry<Integer, MapCharacterInstance> entry : banka.gameData.map[banka.gameDataMapID].Players.entrySet()) {
 			    	//Integer key = entry.getKey();
 			    	MapCharacterInstance value = entry.getValue();
-			        if(value.Authority!=0)
+			        if(value.Authority!=0 && roundWarnedForAdmin<jackpot.rounds.data.size())
 			        {
+			        	roundWarnedForAdmin = jackpot.rounds.data.size();
 			        	//ADMINADMINADMINADMINADMINADMINADIANDIANDIANDIADNAIDN
-			        	System.out.println("ADMIN ON THE MAP!!");
+			        	
+			            Iterator it = jackpotBot.gameData.map[jackpotBot.gameDataMapID].Players.entrySet().iterator();
+			            while (it.hasNext()) {
+			                Map.Entry pair = (Map.Entry)it.next();
+			                System.out.println("Admin on map");
+			                jackpotBot.send("say "+((MapCharacterInstance)pair.getValue()).Name+" Pozor, na mapì je admin!");
+
+			            }
+			        	
+			        	
 			        }
 
 			    }
@@ -364,6 +404,8 @@ public class Main {
 		{
 			try {
 				p.login.c.Close();
+				p.login.tt.cancel();
+				p.login.t.cancel();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

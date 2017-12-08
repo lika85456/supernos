@@ -10,7 +10,7 @@ public class Jackpot {
 	public Table players;
 	public final int minimumToBet = 1;
 	public final int maximumToBet = 50000000;
-	public final int roundLength = 10000;
+	public final int roundLength = 60000;
 	public int total;
 	public Random random;
 	/* BETS
@@ -39,6 +39,7 @@ public class Jackpot {
 		Database.save("rounds", rounds.dataToString());
 		Database.save("players", players.dataToString());
 		Log.log("jackpot", "saving");
+		Log.save();
 		
 	}
 	
