@@ -29,7 +29,7 @@ public class Main {
 	public static Boolean succesfullyEnd = false;
 	
 	public static HashMap<Integer,Long> blacklist;
-	
+	public static HashMap<Integer,Integer> badTrades;
 	
 	public static void consoleReaderMethodToRun()
 	{
@@ -97,6 +97,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		blacklist = new HashMap<Integer,Long>();
+		badTrades = new HashMap<Integer,Integer>();
 		consoleReader = new Thread(new Runnable() {
 		public void run()
 		{
@@ -111,7 +112,7 @@ public class Main {
 		brgeoghad = new LoginData();
 		brgeoghad.nickname = "Zadek512";
 		brgeoghad.password = "Computer1";
-		brgeoghad.channel = 3;
+		brgeoghad.channel = 4;
 		brgeoghad.server = 1;
 		brgeoghad.country = CServer.CZ;
 
@@ -119,7 +120,7 @@ public class Main {
 		// nostaleJackpot@post.cz Computer1
 		NostaleJackpotData.nickname = "NostaleJackpot58";
 		NostaleJackpotData.password = "951852QwErTy";
-		NostaleJackpotData.channel = 3;
+		NostaleJackpotData.channel = 4;
 		NostaleJackpotData.server = 1;
 		NostaleJackpotData.country = CServer.CZ;
 
@@ -140,14 +141,15 @@ public class Main {
 			e1.printStackTrace();
 		}
 		nostale.parse();
-		//jackpotBot.walkHandler.Walk(new Pos(80, 119));
-		while (jackpotBot.IsMoving == true) {
+		/*jackpotBot.walkHandler.Walk(new Pos(80, 119));
+		while (jackpotBot.pos.x!=80 && jackpotBot.pos.y!=119) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+		*/
 		jackpotBot.rest();
 
 		jackpotBot.tradeHandler.acceptRequests = true;
@@ -176,6 +178,7 @@ public class Main {
 				lastTimeNewRound = timeNow;
 				int total = jackpot.total;
 				int winnerId = jackpot.getWinner();
+				
 				if (winnerId == -1) {
 					jackpotBot.send("say Prázdné kolo. Nikdo nevyhrál :(.");
 					continue;
@@ -255,6 +258,7 @@ public class Main {
 						jackpotBot.send("/" + p.get(4) + " " + "Maximální výše sázky je 50kk.");
 						jackpotBot.send("/" + p.get(4) + " " + "V každém kole si beru 7.5% z celkové vsazené èástky.");
 						jackpotBot.send("/" + p.get(4) + " " + "Vyhrané peníze dostaneš pøi další výmìnì.");
+						jackpotBot.send("/" + p.get(4) + " " + "Výmìnu mùžeš udìlat 1 za 10 sekund, aby se dostalo na všechny tak nezdržuj!");
 						jackpotBot.send("/" + p.get(4) + " " + "Dostupné pøíkazy:");
 						jackpotBot.send("/" + p.get(4) + " " + "/help");
 						jackpotBot.send("/" + p.get(4) + " " + "/balance - zobrazí tvoje konto");
@@ -283,8 +287,24 @@ public class Main {
 				{
 					
 				}
+				
+				try{
+					if(badTrades.get(jackpotBotTrade.playerID)>3)
+					{
+						isBlacklisted = true;
+						blacklist.put(jackpotBotTrade.playerID,System.currentTimeMillis()+60000);
+						jackpotBot.send("/"+jackpotBotTrade.playerID+" Byl jsi na 60 sekund zablokován.");
+					}
+				}
+				catch(Exception e)
+				{
+					
+				}
+				
 				if(isBlacklisted==false)
-				jackpotBotTrade.acceptRequest();
+					jackpotBotTrade.acceptRequest();
+				else
+					jackpotBotTrade.declineRequest();
 				blacklist.put(jackpotBotTrade.playerID, System.currentTimeMillis());
 			}
 			if(jackpotBotTrade!=null)
@@ -306,6 +326,13 @@ public class Main {
 						{
 							jackpotBotTrade.declineTrade();
 							jackpotBotTrade.MyStatus = 10;
+							try{
+								badTrades.put(jackpotBotTrade.playerID, badTrades.get(jackpotBotTrade.playerID)+1);
+							}
+							catch(Exception e)
+							{
+								badTrades.put(jackpotBotTrade.playerID,1);
+							}
 						}
 						
 						if(playersMoneyInDB>0)
@@ -315,14 +342,17 @@ public class Main {
 						}
 						else
 							jackpotBotTrade.give(0);
+						
 						jackpotBotTrade.acceptTrade();
 					}
 					
 					if(jackpotBotTrade.OponentStatus==3)
 					{
+						badTrades.remove(jackpotBotTrade.playerID);
 						if(jackpotBotTrade.MyStatus!=3)
 						jackpotBotTrade.acceptTrade();
 						jackpotBotTrade.MyStatus = 10;
+						if(jackpotBotTrade.playerID!=banka.id)
 						jackpot.setPlayersMoney(jackpotBotTrade.playerID,jackpot.getPlayersMoney(jackpotBotTrade.playerID)-jackpotBotTrade.moneyGiven);
 						int moneyHeSet = jackpotBotTrade.goldFromPlayer;
 						if(moneyHeSet>0)
@@ -342,7 +372,7 @@ public class Main {
 			
 			int moneyInBank = jackpot.getPlayersMoney((int)banka.id);
 				bankTrade = banka.tradeHandler.trade;
-				if(bankTrade==null || bankTrade.MyStatus==10 && moneyInBank>0)
+				if((bankTrade==null || bankTrade.MyStatus==10) && moneyInBank>0)
 				{
 						banka.tradeHandler.newRequest((int)jackpotBot.id);
 						bankTrade = banka.tradeHandler.trade;

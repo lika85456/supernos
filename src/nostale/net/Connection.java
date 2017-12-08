@@ -41,13 +41,13 @@ public class Connection{
 
     }
     
-    public String[] GetReceived()
+    private String[] getReceived()
     {
-    	String[] received = Crypto.DecryptGamePacket(getReceived()).toArray(new String[0]);
+    	String[] received = Crypto.DecryptGamePacket(getReceivedBytes()).toArray(new String[0]);
     	    	
         return  received;
     }
-    public ArrayList<Integer> getReceived()
+    private ArrayList<Integer> getReceivedBytes()
     {
        ArrayList<Integer> received = new ArrayList<Integer>();
         try 
@@ -68,7 +68,7 @@ public class Connection{
      * @param String packet - RAW packet to send
      * 
      */
-    public void Send(String packet) throws Exception
+    protected void send(String packet) throws Exception
     {     
 
     	//outToServer.writeBytes(packet);

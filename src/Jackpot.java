@@ -84,7 +84,7 @@ public class Jackpot {
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 		if(set==false)
