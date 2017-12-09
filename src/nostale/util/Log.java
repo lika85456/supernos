@@ -9,33 +9,30 @@ public class Log {
 	private static String log = "";
 	private static int logCall = 0;
 	private static final int callsToSave = 50;
-	public static String getLog()
-	{
+
+	public static String getLog() {
 		return log;
 	}
-	
-	public static void log(String type,String content)
-	{
+
+	public static void log(String type, String content) {
 		logCall++;
-		String tLog = Log.getCurrentTimeStamp()+" "+type.toUpperCase()+"->"+content+"\n";
-		log+=tLog;
+		String tLog = Log.getCurrentTimeStamp() + " " + type.toUpperCase() + "->" + content + "\n";
+		log += tLog;
 		System.out.println(tLog);
-		if(logCall>callsToSave)
-		{
+		if (logCall > callsToSave) {
 			logCall = 0;
 			save();
 		}
 	}
-	
-	public static void save()
-	{
-		Database.save("log",Database.load("log")+Log.log);
+
+	public static void save() {
+		Database.save("log", Database.load("log") + Log.log);
 	}
-	
+
 	public static String getCurrentTimeStamp() {
-	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");//dd/MM/yyyy
-	    Date now = new Date();
-	    String strDate = sdfDate.format(now);
-	    return strDate;
+		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss");// dd/MM/yyyy
+		Date now = new Date();
+		String strDate = sdfDate.format(now);
+		return strDate;
 	}
 }
