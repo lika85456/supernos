@@ -6,7 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Database {
-	public static void save(String file, String content) {
+	public static void save(String file,String content)
+	{
 		FileOutputStream out;
 		try {
 			out = new FileOutputStream(file);
@@ -18,21 +19,23 @@ public class Database {
 		}
 
 	}
-
-	public static String load(String file) {
+	
+	public static String load(String file)
+	{
 		try {
-			String[] lines = Files.readAllLines(Paths.get(file)).toArray(new String[0]);
+			String[] lines =Files.readAllLines(Paths.get(file)).toArray(new String[0]);
 			String toReturn = "";
-			for (int i = 0; i < lines.length; i++) {
-				toReturn += lines[i] + "\n";
+			for(int i = 0;i<lines.length;i++)
+			{
+				toReturn+=lines[i]+"\n";
 			}
 			return toReturn;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "";
-
+			
 		}
 	}
-
+	
 }

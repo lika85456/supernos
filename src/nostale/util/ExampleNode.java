@@ -23,19 +23,19 @@ package nostale.util;
  */
 public class ExampleNode extends AbstractNode {
 
-	public ExampleNode(int xPosition, int yPosition) {
-		super(xPosition, yPosition);
-		// do other init stuff
-	}
+        public ExampleNode(int xPosition, int yPosition) {
+            super(xPosition, yPosition);
+            // do other init stuff
+        }
 
-	@Override
-	public void sethCosts(AbstractNode endNode) {
-		this.sethCosts((absolute(this.getxPosition() - endNode.getxPosition())
-				+ absolute(this.getyPosition() - endNode.getyPosition())) * BASICMOVEMENTCOST);
-	}
+        public void sethCosts(AbstractNode endNode) {
+            this.sethCosts((absolute(this.getxPosition() - endNode.getxPosition())
+                    + absolute(this.getyPosition() - endNode.getyPosition()))
+                    * BASICMOVEMENTCOST);
+        }
 
-	private int absolute(int a) {
-		return a > 0 ? a : -a;
-	}
+        private int absolute(int a) {
+            return a > 0 ? a : -a;
+        }
 
 }

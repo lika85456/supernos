@@ -13,92 +13,105 @@ public class Jackpot {
 	public final int roundLength = 60000;
 	public int total;
 	public Random random;
-	/*
-	 * BETS PLAYER_ID|GOLD
+	/* BETS
+	 * PLAYER_ID|GOLD
+	 */
+	
+	/* ROUNDS
+	 * ROUND_ID|WINNER_PLAYER_ID
 	 */
 
-	/*
-	 * ROUNDS ROUND_ID|WINNER_PLAYER_ID
+	/* PLAYERS
+	 * PLAYER_ID|GOLD
 	 */
-
-	/*
-	 * PLAYERS PLAYER_ID|GOLD
-	 */
-
-	public Jackpot() {
+	
+	public Jackpot()
+	{
 		random = new Random();
 		bets = new Table();
 		rounds = new Table();
 		players = new Table();
 	}
-
-	public void save() {
+	
+	public void save()
+	{
 		Database.save("bets", bets.dataToString());
 		Database.save("rounds", rounds.dataToString());
 		Database.save("players", players.dataToString());
 		Log.log("jackpot", "saving");
 		Log.save();
-
+		
 	}
-
-	public void load() // loads jackpot data if possible
+	
+	public void load() //loads jackpot data if possible
 	{
 		bets = Table.dataFromString(Database.load("bets"));
 		rounds = Table.dataFromString(Database.load("rounds"));
 		players = Table.dataFromString(Database.load("players"));
 	}
-
-	public void bet(int playerID, int gold) {
-		bets.add(new String[] { String.valueOf(playerID), String.valueOf(gold) });
-		total += gold;
-		Log.log("jackpot", "Bet from:" + playerID + " gold:" + gold);
+	
+	public void bet(int playerID,int gold)
+	{
+		bets.add(new String[]{String.valueOf(playerID),String.valueOf(gold)});
+		total+=gold;
+		Log.log("jackpot", "Bet from:"+playerID+" gold:"+gold);
 	}
-
-	public int getPlayersMoney(int playerID) {
-		for (String[] d : players.data) {
-			if (d[0].equals(String.valueOf(playerID)))
-				return Integer.parseInt(d[1]);
+	
+	public int getPlayersMoney(int playerID)
+	{
+		for(String[] d:players.data)
+		{
+			if(d[0].equals(String.valueOf(playerID))) return Integer.parseInt(d[1]);
 		}
 		return 0;
 	}
-
-	public void setPlayersMoney(int playerID, int gold) {
+	
+	public void setPlayersMoney(int playerID,int gold)
+	{
 		Boolean set = false;
-		try {
-			for (String[] d : players.data) {
-				if (d[0].equals(String.valueOf(playerID))) {
-					String[] toWrite = new String[] { d[0], String.valueOf(gold) };
+		try
+		{
+			for(String[] d:players.data)
+			{
+				if(d[0].equals(String.valueOf(playerID)))
+				{
+					String[] toWrite = new String[]{d[0],String.valueOf(gold)};
 					players.data.remove(d);
 					players.data.add(toWrite);
 					set = true;
 				}
 			}
-		} catch (Exception e) {
-			// e.printStackTrace();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 
-		if (set == false) {
-			players.data.add(new String[] { String.valueOf(playerID), String.valueOf(gold) });
+		if(set==false)
+		{
+			players.data.add(new String[]{String.valueOf(playerID),String.valueOf(gold)});
 		}
 	}
-
-	public int getWinner() {
-
-		int winningNumber = (int) (random.nextDouble() * total);
+	
+	public int getWinner()
+	{
+		
+		int winningNumber = (int)(random.nextDouble()*total);
 		int sum = 0;
 		int sum1 = 0;
-		for (String[] bet : bets.data) {
+		for(String[] bet:bets.data)
+		{
 			sum1 = Integer.parseInt(bet[1]);
-			if (winningNumber <= sum1 && winningNumber >= sum) {
+			if(winningNumber<=sum1 && winningNumber>=sum)
+			{
 				int winnerId = Integer.valueOf(bet[0]);
-				// int go = Integer.valueOf(bet[1]);
-				Log.log("jackpot", "Winner is: " + winnerId + " with:" + bet[1] + " gold");
+				//int go = Integer.valueOf(bet[1]);
+				Log.log("jackpot","Winner is: "+winnerId+" with:"+bet[1]+" gold");
 				int winnersMoney = getPlayersMoney(winnerId);
-				// if(winnersMoney!=0)
-				// Log.log("jackpot", "WTF!! this guy:"+winnerId+" has:
-				// "+winnersMoney+" even he won right now");
-				float moneyToSet = winnersMoney + (total / 100f * 92.5f);
-				setPlayersMoney(winnerId, (int) moneyToSet);
+				//if(winnersMoney!=0)
+				//Log.log("jackpot", "WTF!! this guy:"+winnerId+" has: "+winnersMoney+" even he won right now");
+				float moneyToSet = winnersMoney + ((float)total/100f*92.5f);
+				setPlayersMoney(winnerId,(int)moneyToSet);
 				newRound();
 				save();
 				total = 0;
@@ -109,10 +122,12 @@ public class Jackpot {
 		save();
 		return -1;
 	}
-
-	public void newRound() {
-		rounds.add(new String[] { bets.dataToString() });
+	
+	
+	public void newRound()
+	{
+		rounds.add(new String[]{bets.dataToString()});
 		bets = new Table();
-		Log.log("jackpot", "New round number: " + rounds.data.size());
+		Log.log("jackpot", "New round number: "+rounds.data.size());
 	}
 }
