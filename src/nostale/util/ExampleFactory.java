@@ -22,9 +22,9 @@ package nostale.util;
  */
 public class ExampleFactory implements NodeFactory {
 
-        @Override
-        public AbstractNode createNode(int x, int y) {
-            return new ExampleNode(x, y);
-        }
+	@Override
+	public AbstractNode createNode(int x, int y) {
+		return new ExampleNode(x, y);
+	}
 
 }
