@@ -2,88 +2,88 @@ package nostale.data;
 
 public class NpcMonster {
 	public String NameID;
-	
-    public short AmountRequired;
 
-    public short AttackClass;
+	public short AmountRequired;
 
-    public short AttackUpgrade;
+	public short AttackClass;
 
-    public short BasicArea;
+	public short AttackUpgrade;
 
-    public short BasicCooldown;
+	public short BasicArea;
 
-    public short BasicRange;
+	public short BasicCooldown;
 
-    public short BasicSkill;
+	public short BasicRange;
 
-    public short CloseDefence;
+	public short BasicSkill;
 
-    public short Concentrate;
+	public short CloseDefence;
 
-    public short CriticalChance;
+	public short Concentrate;
 
-    public short CriticalRate;
+	public short CriticalChance;
 
-    public short DamageMaximum;
+	public short CriticalRate;
 
-    public short DamageMinimum;
+	public short DamageMaximum;
 
-    public short DarkResistance;
+	public short DamageMinimum;
 
-    public short DefenceDodge;
+	public short DarkResistance;
 
-    public short DefenceUpgrade;
+	public short DefenceDodge;
 
-    public short DistanceDefence;
+	public short DefenceUpgrade;
 
-    public short DistanceDefenceDodge;
+	public short DistanceDefence;
 
-    public short Element;
+	public short DistanceDefenceDodge;
 
-    public short ElementRate;
+	public short Element;
 
-    public short FireResistance;
+	public short ElementRate;
 
-    public short HeroLevel;
+	public short FireResistance;
 
-    public int HeroXp;
+	public short HeroLevel;
 
-    public Boolean IsHostile;
+	public int HeroXp;
 
-    public int JobXP;
+	public Boolean IsHostile;
 
-    public short Level;
+	public int JobXP;
 
-    public short LightResistance;
+	public short Level;
 
-    public short MagicDefence;
+	public short LightResistance;
 
-    public int MaxHP;
+	public short MagicDefence;
 
-    public int MaxMP;
+	public int MaxHP;
 
-    public nostale.domain.MonsterType MonsterType;
+	public int MaxMP;
 
-    public String Name;
+	public nostale.domain.MonsterType MonsterType;
 
-    public Boolean NoAggresiveIcon;
+	public String Name;
 
-    public short NoticeRange;
+	public Boolean NoAggresiveIcon;
 
-    public short NpcMonsterVNum;
+	public short NoticeRange;
 
-    public short Race;
+	public short NpcMonsterVNum;
 
-    public short RaceType;
+	public short Race;
 
-    public int RespawnTime;
+	public short RaceType;
 
-    public short Speed;
+	public int RespawnTime;
 
-    public short VNumRequired;
+	public short Speed;
 
-    public short WaterResistance;
+	public short VNumRequired;
 
-public int XP;
+	public short WaterResistance;
+
+	public int XP;
 }

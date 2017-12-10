@@ -2,65 +2,65 @@ package nostale.data;
 
 public class Skill {
 	public String NameID;
-	
-    public short AttackAnimation;
 
-    public short CastAnimation;
+	public short AttackAnimation;
 
-    public short CastEffect;
+	public short CastAnimation;
 
-    public short CastId;
+	public short CastEffect;
 
-    public short CastTime;
+	public short CastId;
 
-    public short Class;
+	public short CastTime;
 
-    public short Cooldown;
+	public short Class;
 
-    public short CPCost;
+	public short Cooldown;
 
-    public short Duration;
+	public short CPCost;
 
-    public short Effect;
+	public short Duration;
 
-    public short Element;
-    
-    public short HitType;
+	public short Effect;
 
-    public short ItemVNum;
+	public short Element;
 
-    public short Level;
+	public short HitType;
 
-    public short LevelMinimum;
+	public short ItemVNum;
 
-    public short MinimumAdventurerLevel;
+	public short Level;
 
-    public short MinimumArcherLevel;
+	public short LevelMinimum;
 
-    public short MinimumMagicianLevel;
+	public short MinimumAdventurerLevel;
 
-    public short MinimumSwordmanLevel;
+	public short MinimumArcherLevel;
 
-    public short MpCost;
+	public short MinimumMagicianLevel;
 
-    public String Name;
+	public short MinimumSwordmanLevel;
 
-    public int Price;
+	public short MpCost;
 
-    public short Range;
+	public String Name;
 
-    public short SkillType;
+	public int Price;
 
-    public short SkillVNum;
+	public short Range;
 
-    public short TargetRange;
+	public short SkillType;
 
-    public short TargetType;
+	public short SkillVNum;
 
-    public short Type;
+	public short TargetRange;
 
-    public short UpgradeSkill;
+	public short TargetType;
 
-    public short UpgradeType;
+	public short Type;
+
+	public short UpgradeSkill;
+
+	public short UpgradeType;
 
 }

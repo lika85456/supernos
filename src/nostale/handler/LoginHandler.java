@@ -1,5 +1,6 @@
 package nostale.handler;
 
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Timer;
@@ -12,7 +13,6 @@ import nostale.domain.ClassType;
 import nostale.gameobject.Player;
 import nostale.net.Connection;
 import nostale.net.Crypto;
-import nostale.packet.Packet;
 import nostale.data.Character;
 
 public class LoginHandler extends Handler {
@@ -22,6 +22,7 @@ public class LoginHandler extends Handler {
 	private Connection c;
 	private Server s;
 	private GameServer[] channels;
+	private HashMap<Integer,Character> characters;
 	public Timer t;
 	public TimerTask tt;
 	private int time = 0;
@@ -31,6 +32,7 @@ public class LoginHandler extends Handler {
 
 	public LoginHandler(Player p) {
 		super(p);
+		this.characters = new HashMap<Integer,Character>();
 		accData = p.accData;
 
 		s = new Server(accData.Nation);
@@ -53,20 +55,50 @@ public class LoginHandler extends Handler {
 			String decryptedRec = Crypto.DecryptLoginPacket(received);
 
 			parseLoginPacket(decryptedRec);
-			for(GameServer gs:channels)
-			{
-				if(gs.channel.equals(String.valueOf(accData.Channel)) && gs.server.equals(String.valueOf(accData.Server)) )
-				{
-					SelectServer(gs);
+			for (GameServer gs : channels) {
+				if (gs.channel.equals(String.valueOf(accData.Channel))
+						&& gs.server.equals(String.valueOf(accData.Server))) {
+					selectServer(gs);
+					selectChar(characters.get(accData.Character));
+					succefullyLoggedIn = true;
+					p.c = this.c;
+					p.session = session;
+					p.t = t;
+					p.tt = tt;
 				}
 			}
 
+			parseChars();
 		} catch (Exception e) {
 			System.out.println("No internet connection!");
 			e.printStackTrace();
 			return;
 		}
 
+	}
+
+	private void selectChar(Character ch) {
+
+		try {
+
+			send("select " + ch.Slot);
+			Boolean s = true;
+			while (s == true) {
+				String[] received = c.getReceived();
+				for (String rec : received) {
+
+					if (rec.contains("OK")) {
+						send("game_start");
+						send("lbs 0");
+						s = false;
+					}
+				}
+				Thread.sleep(5);
+			}
+
+		} catch (Exception e) {
+
+		}
 	}
 
 	private void parseServer(String[] p) {
@@ -92,89 +124,80 @@ public class LoginHandler extends Handler {
 			e.printStackTrace();
 		}
 	}
-	
-    private void SelectServer(GameServer s)
-    {
-        c = new Connection();
-        try
-        {
 
-        c.Connect(s.ip, s.port);
-        Packet.id++;
-        c.send(Crypto.EncryptGamePacket(Packet.id + Integer.toString(this.session),this.session,true));
-        Thread.sleep(200);
-        Packet.id++;
-        c.send(Crypto.EncryptGamePacket(Packet.id + accData.nickname,this.session,false) + Crypto.EncryptGamePacket(Packet.id+1 + accData.password,this.session,false));
-        Packet.id++;
-        parseChars();
+	private void selectServer(GameServer s) {
+		c = new Connection();
+		try {
 
-        t = new Timer();
-        tt = new TimerTask() {
-            @Override
-            public void run() {
-            	time+=60;
-                try {
-					send("pulse "+time+" 0");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			c.Connect(s.ip, s.port);
+			player.packetId++;
+			c.send(Crypto.EncryptGamePacket(player.packetId +" "+Integer.toString(this.session), this.session, true));
+			Thread.sleep(200);
+			player.packetId++;
+			c.send(Crypto.EncryptGamePacket(player.packetId +" "+ accData.nickname, this.session, false)
+					+ Crypto.EncryptGamePacket((player.packetId + 1 )+" "+ accData.password, this.session, false));
+			player.packetId++;
+			parseChars();
 
-            };
-        };
-        
-        t.schedule(tt,60000,60000);
-    	
-        }
-        catch(Exception e)
-        {
-        	e.printStackTrace();
-        }
-}
-	
-    private void parseChars() throws Exception
-    {
-        String lastPacket = "";
-        ArrayList<Character> tempChars = new ArrayList<Character>();
-        while(!lastPacket.contains("clist_end"))
-        {
-          String[] received = c.getReceived();
-          for(String rec:received)
-          {
-             lastPacket = rec;
+			t = new Timer();
+			tt = new TimerTask() {
+				@Override
+				public void run() {
+					time += 60;
+					try {
+						send("pulse " + time + " 0");
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 
-             //System.out.println(":"+parsePacket(rec)[0]+":"+(parsePacket(rec)[0]=="clist"));
-             //System.out.println(":"+parsePacket(rec)[0]+":");
-             if(parsePacket(rec)[0].equals("clist"))
-             {
-                tempChars.add(parseChar(rec));
-             }
-          }
-        } 
-        send("c_close");
-        send("f_stash_end");
-        this.characters = tempChars.toArray(new Character[0]);
-    
-}
-    
-    public void send(String s) throws Exception
-    {
-    	c.Send(Crypto.EncryptGamePacket(packetId()+s,this.session,false));
-}
-	
-	   private String[] parsePacket(String packet)
-	    {
-	       return packet.split(" ");
+				};
+			};
+
+			t.schedule(tt, 60000, 60000);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	    private Character parseChar(String pa)
-	    {
-	       Character chara = new Character();
-	       String[] p = parsePacket(pa);
-	       chara.Slot = (byte)Integer.parseInt(p[1]);
-	       chara.Name = p[2];
-	       chara.Class = ClassType.values()[(Integer.parseInt(p[8]))];
-	       chara.Level = (byte)Integer.parseInt(p[9]);
-	       chara.JobLevel = (byte)Integer.parseInt(p[12]);
 
-	       return chara;
+	private void parseChars() throws Exception {
+		String lastPacket = "";
+		while (!lastPacket.contains("clist_end")) {
+			String[] received = c.getReceived();
+			for (String rec : received) {
+				lastPacket = rec;
+
+				// System.out.println(":"+parsePacket(rec)[0]+":"+(parsePacket(rec)[0]=="clist"));
+				// System.out.println(":"+parsePacket(rec)[0]+":");
+				if (parsePacket(rec)[0].equals("clist")) {
+					Character tmp = parseChar(rec);
+					characters.put((int)tmp.Slot,parseChar(rec));
+				}
+			}
+		}
+		send("c_close");
+		send("f_stash_end");
+
+	}
+
+	public void send(String s) throws Exception {
+		player.packetId++;
+		c.send(Crypto.EncryptGamePacket(player.packetId +" "+ s, this.session, false));
+	}
+
+	private String[] parsePacket(String packet) {
+		return packet.split(" ");
+	}
+
+	private Character parseChar(String pa) {
+		Character chara = new Character();
+		String[] p = parsePacket(pa);
+		chara.Slot = (byte) Integer.parseInt(p[1]);
+		chara.Name = p[2];
+		chara.Class = ClassType.values()[(Integer.parseInt(p[8]))];
+		chara.Level = (byte) Integer.parseInt(p[9]);
+		chara.JobLevel = (byte) Integer.parseInt(p[12]);
+
+		return chara;
 	}
 }

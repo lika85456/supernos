@@ -6,8 +6,6 @@ public class Packet {
 	public String name; // Name of packet, example - walk x x -> name = walk
 	private String[] parameters;
 
-	public static int id = 247; // Id of packet to be sent
-
 	// Packet restrictors for time
 	public int timeToWait = 0; // in miliseconds time between send delay
 
@@ -38,12 +36,6 @@ public class Packet {
 	@Override
 	public String toString() {
 		return this.packetString;
-	}
-	
-	public String toSend()
-	{
-		id++;
-		return id+toString();
 	}
 
 }
