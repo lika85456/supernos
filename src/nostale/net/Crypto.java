@@ -1,10 +1,15 @@
 package nostale.net;
-import java.security.*;
+
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.math.*;
+import java.util.Calendar;
 
 public class Crypto {
+	public static String LOG = "";
+
 	public static String encrypt(String passwordToHash) {
 		String generatedPassword = null;
 		try {
@@ -32,6 +37,7 @@ public class Crypto {
 		String str_dec = "";
 		for (int i = 0; i < str.size(); i++)
 			str_dec += (char) (str.get(i) - 0xF);
+		Crypto.addToLog("Login packet income", str_dec.substring(0, str_dec.length() - 1));
 		return str_dec.substring(0, str_dec.length() - 1);
 	}
 
@@ -39,102 +45,63 @@ public class Crypto {
 		String str_enc = "";
 		for (int i = 0; i < str.length(); i++)
 			str_enc += (char) ((str.charAt(i) ^ 0xC3) + 0xF);
+		Crypto.addToLog("Login packet sent", str);
 		return str_enc += (char) 0xD8;
 	}
 
 	private static String ArrayListToString(ArrayList<Integer> output) {
 		String returnValue = "";
 		for (int i = 0; i < output.size(); i++) {
-			returnValue += (char)(int)output.get(i);
+			returnValue += (char) (int) output.get(i);
 
 		}
 		return returnValue;
 	}
-	
-	private static String IntegerArrayToString(int[] input)
-	{
+
+	private static String IntegerArrayToString(int[] input) {
 		String returnValue = "";
 		for (int i = 0; i < input.length; i++) {
-			returnValue += (char)(int)input[i];
+			returnValue += (char) input[i];
 
 		}
-		return returnValue;		
+		return returnValue;
 	}
 
-	private static ArrayList<Integer> StringToInt(String str)
-	{
+	private static ArrayList<Integer> StringToInt(String str) {
 		ArrayList<Integer> temp = new ArrayList<Integer>();
-		for(int i=0;i<str.length();i++)
-		{
-			temp.add((int)str.charAt(i));
+		for (int i = 0; i < str.length(); i++) {
+			temp.add((int) str.charAt(i));
 		}
 		return temp;
 	}
-	
-    public static ArrayList<Integer> EncryptServerPacket(String str)
-    {
-        ArrayList<Integer> StrBytes = StringToInt(str);
-        int BytesLength = StrBytes.size();
 
-        int[] encryptedData = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 1];
+	/*
+	 * public static ArrayList<Integer> EncryptServerPacket(String str) {
+	 * Crypto.addToLog("Game packet sent",str);
+	 * 
+	 * ArrayList<Integer> StrBytes = StringToInt(str); int BytesLength =
+	 * StrBytes.size();
+	 * 
+	 * int[] encryptedData = new int[BytesLength + (int)Math.ceil(BytesLength /
+	 * 0x7E) + 1];
+	 * 
+	 * int ii = 0; for (int i = 0; i < BytesLength; i++) { if (i % 0x7E == 0) {
+	 * if(BytesLength-i>0x7E) encryptedData[i+ii]=0x7E; else
+	 * encryptedData[i+ii]=(BytesLength-i) & 0xFF; ii++; } encryptedData[i + ii]
+	 * = reverse_byte(StrBytes.get(i)); }
+	 * 
+	 * encryptedData[encryptedData.length - 1] = 0xFF;
+	 * 
+	 * ArrayList<Integer> list = new ArrayList<Integer>(encryptedData.length);
+	 * for (int i : encryptedData) list.add(i); return list; }
+	 * 
+	 */
 
-        int ii = 0;
-        for (int i = 0; i < BytesLength; i++)
-        {
-            if (i % 0x7E == 0)
-            {
-            	if(BytesLength-i>0x7E) encryptedData[i+ii]=0x7E;
-            	else encryptedData[i+ii]=(BytesLength-i) & 0xFF;
-                ii++;
-            }
-            encryptedData[i + ii] = reverse_byte(StrBytes.get(i));
-            System.out.println(encryptedData[i+ii]);
-        }
-        
-        encryptedData[encryptedData.length - 1] = 0xFF;
-        System.out.println(encryptedData[6]);
-        ArrayList<Integer> list = new ArrayList<Integer>(encryptedData.length);
-        for (int i : encryptedData) list.add(i);
-        return list;
-}
-	
-	
-	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf)
-	{
-         
-         ArrayList<String> packets = new ArrayList<String>();
-         int BytesLength = buf.size();
-         int ii=0;
-         int[] current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
-         for(int i = 0; i < BytesLength; i++)
-         {
-        	 if(buf.get(i)==0xFF)
-        	 {
-        		 current_packet[0] = 0;
-        		 packets.add(IntegerArrayToString(current_packet));
-        		 System.out.println(IntegerArrayToString(current_packet));
-        		 current_packet = new int[BytesLength + (int)Math.ceil(BytesLength / 0x7E) + 2];
-        		 
-        	 }
-             if (i % 0x7E == 0)
-             {
-             	if(BytesLength-i>0x7E) current_packet[i+ii]=0x7E;
-             	else continue;
-                 ii++;
-             }
-             current_packet[i+ii]= reverse_byte(buf.get(i));
-         }
-        return packets;
-        
+	public static int reverse_byte(int s) {
+		return 0xFF - s;
 	}
-	
-	public static int reverse_byte(int s)
-	{
-		return 0xFF-s;
-	}
-	
-	
-	public static ArrayList<String> DecryptGamePacketTest(ArrayList<Integer> buf) {
+
+	public static ArrayList<String> DecryptGamePacket(ArrayList<Integer> buf) {
 		int len = buf.size();
 		ArrayList<String> output = new ArrayList<String>();
 		ArrayList<Integer> current_packet = new ArrayList<Integer>();
@@ -146,33 +113,44 @@ public class Crypto {
 			currentByte = buf.get(index);
 			++index;
 			if (currentByte == 0xFF) {
-				output.add(ArrayListToString(current_packet));
-				//System.out.println("RECEIVED: "+ArrayListToString(current_packet));
+
+				try {// ISO-8859-1
+					String toAdd = new String(ArrayListToString(current_packet).getBytes("ISO-8859-1"));
+					output.add(toAdd);
+					if (!toAdd.contains("mv") && !toAdd.contains("st"))
+						Crypto.addToLog("Game packet income", toAdd);
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				// System.out.println("RECEIVED:
+				// "+ArrayListToString(current_packet));
 				current_packet = new ArrayList<Integer>();
 				continue;
 			}
 
 			length = (currentByte & 0x7F);
-			if (((currentByte & 0x80) & 0xFF) != 0 && currentByte!=0) {
+			if (((currentByte & 0x80) & 0xFF) != 0 && currentByte != 0) {
 				while (length != 0) {
 					if (index < len) {
 						currentByte = buf.get(index);
 						++index;
-						try{
-						first = keys[(((currentByte & 0xF0) ) >> 4) - 1];
-						if (first != 0x6E)
-							current_packet.add(first);
+						try {
+							first = keys[(((currentByte & 0xF0)) >> 4) - 1];
+							if (first != 0x6E)
+								current_packet.add(first);
 
-						if (length <= 1)
-							break;
-                        
-						second = keys[(currentByte & 0xF) - 1];
-						if (second != 0x6E)
-							current_packet.add(second);
+							if (length <= 1)
+								break;
 
-						length -= 2;
+							second = keys[(currentByte & 0xF) - 1];
+							if (second != 0x6E)
+								current_packet.add(second);
+
+							length -= 2;
+						} catch (Exception e) {
+							System.out.println("Exception packet: " + ArrayListToString(current_packet));
 						}
-						catch(Exception e){System.out.println("Exception packet: "+ArrayListToString(current_packet));}
 					} else {
 						--length;
 					}
@@ -180,7 +158,7 @@ public class Crypto {
 			} else {
 				while (length != 0) {
 					if (index < len) {
-						//current_packet.add(buf.get(index) ^ 0xFF);¨
+						// current_packet.add(buf.get(index) ^ 0xFF);¨
 						current_packet.add(buf.get(index) ^ 0xFF);
 						++index;
 					}
@@ -193,13 +171,29 @@ public class Crypto {
 		return output;
 	}
 
-	public static String EncryptGamePacket(String buf, int session, boolean is_session_packet) {
-		//System.out.println("SEND: "+buf);
-		int packet_length = buf.length();
-		String packet_mask = "";
+	public static String EncryptGamePacket(String buff, int session, boolean is_session_packet) {
+		// System.out.println("SEND: "+buf);
+		Crypto.addToLog("Game packet sent", buff);
+		// try {
+		// buf = new String(buf.getBytes("UTF-8"));
+		// } catch (UnsupportedEncodingException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 
-		for (int i = 0; i < buf.length(); i++) {
-			byte c = (byte) buf.charAt(i);
+		byte[] buf = new byte[1];
+		try {
+			buf = null;
+			buf = buff.getBytes("windows-1250");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int packet_length = buf.length;
+		String packet_mask = "";
+		for (int i = 0; i < buf.length; i++) {
+			char c = (char) buf[i];
 			if (c == '#')
 				packet_mask += '0';
 			else if (0 == (c -= 0x20) || (c += 0xF1) < 0 || (c -= 0xB) < 0 || 0 == (c -= 0xC5))
@@ -208,13 +202,13 @@ public class Crypto {
 				packet_mask += '0';
 		}
 
-		ArrayList<Integer> output = new ArrayList<Integer>();
+		ArrayList<Character> output = new ArrayList<Character>();
 		int sequences = 0, sequence_counter = 0;
 		int last_position = 0, current_position = 0, length = 0;
-		int current_byte = 0;
+		char current_byte = 0;
 		while (current_position <= packet_length) {
 			last_position = current_position;
-			while (current_position < packet_length && packet_mask.charAt(current_position) == '0')
+			while (current_position < packet_length && packet_mask.charAt(current_position) == ('0'))
 				++current_position;
 
 			if (current_position != 0) {
@@ -222,16 +216,17 @@ public class Crypto {
 				sequences = (length / 0x7E);
 				for (int i = 0; i < length; ++i, ++last_position) {
 					if (i == (sequence_counter * 0x7E)) {
-						if (sequences == 0) {
-							output.add(length - i);
+						if (!(sequences != 0)) {
+							output.add(output.size(), (char) (length - i));
+
 						} else {
-							output.add(0x7E);
+							output.add(output.size(), (char) 0x7E);
 							--sequences;
 							++sequence_counter;
 						}
 					}
 
-					output.add(buf.charAt(last_position) ^ 0xFF);
+					output.add(output.size(), (char) (buf[last_position] ^ 0xFF));
 				}
 			}
 
@@ -247,16 +242,16 @@ public class Crypto {
 				sequences = (length / 0x7E);
 				for (int i = 0; i < length; ++i, ++last_position) {
 					if (i == (sequence_counter * 0x7E)) {
-						if (sequences == 0) {
-							output.add((length - i) | 0x80);
+						if (!(sequences != 0)) {
+							output.add(output.size(), (char) ((length - i) | 0x80));
 						} else {
-							output.add(0x7E | 0x80);
+							output.add(output.size(), (char) (0x7E | 0x80));
 							--sequences;
 							++sequence_counter;
 						}
 					}
 
-					current_byte = buf.charAt(last_position);
+					current_byte = (char) buf[last_position];
 					switch (current_byte) {
 					case 0x20:
 						current_byte = 1;
@@ -277,70 +272,79 @@ public class Crypto {
 
 					if (current_byte != 0x00) {
 						if (i % 2 == 0) {
-							output.add((current_byte << 4) & 0xFF);
+							output.add(output.size(), (char) (current_byte << 4));
 						} else {
-							int last = output.get(output.size() - 1);
-							last |= current_byte;
-							output.set(output.size() - 1, last);
+							char t = output.get(output.size() - 1);
+							t = (char) (t | current_byte);
+							output.set(output.size() - 1, t);
 						}
 					}
 				}
 			}
 		}
-		output.add(0xFF);
 
+		output.add(output.size(), (char) 0xFF);
 		output = completeGamePacketEncrypt(output, session, is_session_packet);
 
 		// ArrayList to String
 		String returnValue = "";
 		for (int i = 0; i < output.size(); i++) {
-			returnValue += (char) (int) output.get(i);
+			// System.out.println((int)output.get(i));
+			returnValue += output.get(i);
 
 		}
 
 		return returnValue;
 	}
 
-	private static ArrayList<Integer> completeGamePacketEncrypt(ArrayList<Integer> buf, int session,
-			boolean is_session_packet) {
-		byte session_number = (byte) (((session >> 6) & 0xFF) & 0x80000003);
+	private static ArrayList<Character> completeGamePacketEncrypt(ArrayList<Character> buf, int session,
+			Boolean is_session_packet) {
+		char session_number = (char) (((session >> 6) & 0xFF) & 0x80000003);
 
 		if (session_number < 0)
-			session_number = (byte) (((session_number - 1) | 0xFFFFFFFC) + 1);
+			session_number = (char) (((session_number - 1) | 0xFFFFFFFC) + 1);
 
-		int session_key = (session & 0xFF);
+		char session_key = (char) (session & 0xFF);
 
 		if (is_session_packet)
-			session_number = -1;
+			session_number = (char) -1;
 
 		switch (session_number) {
 		case 0:
 			for (int i = 0; i < buf.size(); ++i)
-				buf.set(i, buf.get(i) + (session_key + 0x40));
+				buf.set(i, (char) (buf.get(i) + (session_key + 0x40)));
 			break;
 
 		case 1:
 			for (int i = 0; i < buf.size(); ++i)
-				buf.set(i, (buf.get(i) - (session_key + 0x40)));
+				buf.set(i, (char) ((buf.get(i) - (session_key + 0x40))));
 			break;
 
 		case 2:
 			for (int i = 0; i < buf.size(); ++i)
-				buf.set(i, (buf.get(i) ^ 0xC3) + (session_key + 0x40));
+				buf.set(i, (char) ((((buf.get(i) ^ 0xC3) + (session_key + 0x40)))));
+
 			break;
 
 		case 3:
 			for (int i = 0; i < buf.size(); ++i)
-				buf.set(i, (buf.get(i) ^ 0xC3) - (session_key + 0x40));
+				buf.set(i, (char) (((((buf.get(i)) ^ 0xC3) - (session_key + 0x40)))));
 			break;
 
 		default:
 			for (int i = 0; i < buf.size(); ++i)
-				buf.set(i, buf.get(i) + 0x0F);
+				buf.set(i, (char) (buf.get(i) + 0x0F));
 			break;
 		}
-
 		return buf;
+	}
+
+	public static void addToLog(String tag, String message) {
+		String timeStamp = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").format(Calendar.getInstance().getTime());
+		String ms = timeStamp + " " + tag.toUpperCase() + " " + message + "\n";
+		ms.replaceAll("\n+", "\n");
+		Crypto.LOG += ms;
+		System.out.print(ms);
 	}
 
 }
