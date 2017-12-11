@@ -60,7 +60,8 @@ public class NpcMonster {
 	public short MagicDefence;
 
 	public int MaxHP;
-
+	public int HP;
+	public int MP;
 	public int MaxMP;
 
 	public nostale.domain.MonsterType MonsterType;

@@ -20,12 +20,13 @@ public class Main {
 		brgeoad.accData = brgeoadAccountData;
 
 		LoginHandler login = new LoginHandler(brgeoad);
+		login = null;
 		MapDataHandler mapData = new MapDataHandler(brgeoad);
 		
 		while(true)
 		{
 			brgeoad.receive();
-			mapData.onReceive();
+			mapData.parse();
 			brgeoad.clear();
 		}
 	}

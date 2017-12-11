@@ -1,4 +1,4 @@
-package nostale.handler;
+package nostale.handler.interfaces;
 
 import nostale.packet.Packet;
 

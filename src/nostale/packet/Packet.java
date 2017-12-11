@@ -24,7 +24,7 @@ public class Packet {
 		return parameters[index + 1];
 	}
 
-	public Integer getIntParameter(int index) {
+	public int getIntParameter(int index) {
 		try {
 			return Integer.parseInt(parameters[index + 1]);
 		} catch (Exception e) {
