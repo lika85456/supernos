@@ -21,12 +21,12 @@ public class Packet {
 	}
 
 	public String getParameter(int index) {
-		return parameters[index + 1];
+		return parameters[index];
 	}
 
 	public int getIntParameter(int index) {
 		try {
-			return Integer.parseInt(parameters[index + 1]);
+			return Integer.parseInt(parameters[index]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

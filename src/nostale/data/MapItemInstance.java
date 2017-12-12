@@ -1,7 +1,5 @@
 package nostale.data;
 
-import nostale.util.Pos;
-
 public class MapItemInstance {
     public int id; //transportid
     public int VNUM;

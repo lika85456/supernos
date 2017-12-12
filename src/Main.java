@@ -3,6 +3,8 @@ import nostale.data.CServer;
 import nostale.gameobject.Player;
 import nostale.handler.LoginHandler;
 import nostale.handler.MapDataHandler;
+import nostale.handler.TradeHandler;
+import nostale.packet.Packet;
 import nostale.resources.Resources;
 
 public class Main {
@@ -22,11 +24,51 @@ public class Main {
 		LoginHandler login = new LoginHandler(brgeoad);
 		login = null;
 		MapDataHandler mapData = new MapDataHandler(brgeoad);
-		
-		while(true)
-		{
+		TradeHandler trade = new TradeHandler(brgeoad) {
+			@Override
+			public void onRequest(Packet p) {
+				// TODO if is blocked dont accept
+				super.onRequest(p);
+				acceptRequest();
+				// this.playerID
+			}
+
+			@Override
+			public void onRequestAccept() {
+				super.onRequestAccept();
+				// nothing, wait until he sets his list
+			}
+
+			@Override
+			public void onExecuteList(int gold) {
+				super.onExecuteList(gold);
+				// Do something
+				executeList(0);
+				if (gold > 0)
+					acceptTrade();
+				else
+					declineTrade();
+			}
+
+			@Override
+			public void onTradeAccept() {
+				super.onTradeAccept();
+				// He accepted
+				// this.playerID
+				// this.OponentGold
+			}
+
+			@Override
+			public void onTradeDecline() {
+				super.onTradeDecline();
+				// Ban that dick
+			}
+
+		};
+		while (true) {
 			brgeoad.receive();
 			mapData.parse();
+			trade.parse();
 			brgeoad.clear();
 		}
 	}

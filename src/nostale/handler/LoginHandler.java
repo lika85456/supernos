@@ -68,7 +68,6 @@ public class LoginHandler extends Handler {
 				}
 			}
 
-			parseChars();
 		} catch (Exception e) {
 			System.out.println("No internet connection!");
 			e.printStackTrace();

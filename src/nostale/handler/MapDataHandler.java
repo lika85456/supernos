@@ -10,11 +10,9 @@ import nostale.data.MapItemInstance;
 import nostale.data.NpcMonster;
 import nostale.data.NpcMonsterInstance;
 import nostale.data.Portal;
-import nostale.domain.UserType;
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IHandler;
 import nostale.packet.Packet;
-import nostale.resources.Map;
 import nostale.resources.Resources;
 import nostale.util.Pos;
 
@@ -23,6 +21,7 @@ public class MapDataHandler extends Handler implements IHandler {
 		super(p);
 	}
 
+	@Override
 	public void parse() {
 		ArrayList<String> toParse = player.received;
 		for (String po : toParse) {
@@ -182,8 +181,8 @@ public class MapDataHandler extends Handler implements IHandler {
 					ch.Level = (byte) packet.getIntParameter(3);
 					ch.HP = packet.getIntParameter(7);
 					ch.HP = packet.getIntParameter(8);
-					ch.MaxHP = (int) (ch.HP / packet.getIntParameter(5) * 100);
-					ch.MaxMP = (int) (ch.MP / packet.getIntParameter(6) * 100);
+					ch.MaxHP = ch.HP / packet.getIntParameter(5) * 100;
+					ch.MaxMP = ch.MP / packet.getIntParameter(6) * 100;
 					tMap.Players.put((int) ch.id, ch);
 				} else if (packetketType == 3) {
 					NpcMonsterInstance m = tMap.Mobs.get(packet.getIntParameter(2));
@@ -194,8 +193,8 @@ public class MapDataHandler extends Handler implements IHandler {
 					m.Level = (short) packet.getIntParameter(3);
 					m.HP = packet.getIntParameter(7);
 					m.MP = packet.getIntParameter(8);
-					m.MaxHP = (int) (m.HP / packet.getIntParameter(5) * 100);
-					m.MaxMP = (int) (m.MP / packet.getIntParameter(6) * 100);
+					m.MaxHP = m.HP / packet.getIntParameter(5) * 100;
+					m.MaxMP = m.MP / packet.getIntParameter(6) * 100;
 					tMap.Mobs.put(m.id, m);
 				}
 
@@ -213,7 +212,7 @@ public class MapDataHandler extends Handler implements IHandler {
 			case "mapout":
 				player.send(new Packet("c_close"));
 				player.send(new Packet("f_stash_end"));
-				tMap = (MapInstance) new MapInstance();
+				tMap = new MapInstance();
 				tMap.Players = new HashMap<Integer, MapCharacterInstance>();
 				tMap.Mobs = new HashMap<Integer, NpcMonsterInstance>();
 				tMap.Items = new HashMap<Integer, MapItemInstance>();
@@ -246,6 +245,7 @@ public class MapDataHandler extends Handler implements IHandler {
 				break;
 
 			}
+			if(tMap!=null)
 			GameData.maps.put(tMap.id, tMap);
 		}
 	}
