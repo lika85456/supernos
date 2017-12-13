@@ -11,6 +11,7 @@ import nostale.data.GameData;
 import nostale.gameobject.Player;
 import nostale.handler.LoginHandler;
 import nostale.handler.MapDataHandler;
+import nostale.handler.TalkHandler;
 import nostale.handler.TradeHandler;
 import nostale.packet.Packet;
 import nostale.resources.Resources;
@@ -22,15 +23,15 @@ public class Main {
 	public static Boolean run = false;
 
 	public static Thread botThread;
-	
+
 	public static Player bankBot;
 	public static Player jackpotBot;
 	public static TradeHandler bankBotTrade;
 	public static TradeHandler jackpotBotTrade = null;
 	public static Jackpot jackpot;
-	
-	public static HashMap<Long,Long> banList = new HashMap<Long,Long>();
-	
+
+	public static HashMap<Long, Long> banList = new HashMap<Long, Long>();
+
 	public static void theBot() {
 		jackpot = new Jackpot();
 		jackpot.load();
@@ -43,7 +44,7 @@ public class Main {
 		bankAccData.Server = 1;
 		bankAccData.Character = 1;
 		bankAccData.Nation = CServer.CZ;
-		
+
 		AccountData jackpotAccData = new AccountData();
 		// nostaleJackpot@post.cz Computer1
 		jackpotAccData.nickname = "NostaleJackpot58";
@@ -52,10 +53,10 @@ public class Main {
 		jackpotAccData.Server = 1;
 		jackpotAccData.Character = 1;
 		jackpotAccData.Nation = CServer.CZ;
-		
+
 		bankBot.accData = bankAccData;
 		jackpotBot.accData = jackpotAccData;
-		
+
 		LoginHandler tLogin = new LoginHandler(bankBot);
 		tLogin = null;
 		tLogin = new LoginHandler(jackpotBot);
@@ -66,42 +67,38 @@ public class Main {
 			@Override
 			public void onRequest(Packet p) {
 				super.onRequest(p);
-				//If he is trading more than 10 secs ban him!
+				// If he is trading more than 10 secs ban him!
 				int tradeID = this.tradeId;
 				TradeHandler tt = this;
-				this.timer = new Timer();				
+				this.timer = new Timer();
 				this.timerTask = new TimerTask() {
-				    @Override
-				    public void run() {
-		                if(tt.tradeId == tradeID)
-		                {
-		                	banList.put(playerID, System.currentTimeMillis()+10000);
-		                	declineTrade();
-		                	
-		                }
-				    };
+					@Override
+					public void run() {
+						if (tt.tradeId == tradeID) {
+							banList.put(playerID, System.currentTimeMillis() + 10000);
+							declineTrade();
+
+						}
+					};
 				};
-				timer.schedule(timerTask,10000);
-				
-				
-				if(banList.containsKey(playerID))
-				{
+				timer.schedule(timerTask, 10000);
+
+				if (banList.containsKey(playerID)) {
 					Long time = banList.get(playerID);
-					if(time<System.currentTimeMillis()) //unban
+					if (time < System.currentTimeMillis()) // unban
 					{
 						banList.remove(playerID);
-						
-					}
-					else
-					{
-						//TODO send him a message that he is banned for X seconds
+
+					} else {
+						// TODO send him a message that he is banned for X
+						// seconds
 						declineRequest();
 						return;
 					}
 				}
 				acceptRequest();
 				// this.playerID
-				banList.put(playerID, System.currentTimeMillis()+5000);
+				banList.put(playerID, System.currentTimeMillis() + 5000);
 			}
 
 			@Override
@@ -114,13 +111,24 @@ public class Main {
 				super.onExecuteList(gold);
 				// Do something
 				int playersMoney = jackpot.getPlayersMoney(playerID);
-				if(playersMoney==0 && gold==0)
-				{
+				if (playersMoney == 0 && gold == 0) {
 					declineTrade();
 					return;
 				}
+
+				if (gold < jackpot.minimumToBet && playersMoney == 0) {
+					player.send(new Packet("/" + playerID + " minimální výše sázky je:" + jackpot.minimumToBet));
+					declineTrade();
+					return;
+				}
+				if (gold > jackpot.maximumToBet) {
+					player.send(new Packet("/" + playerID + " maximální výše sázky je:" + jackpot.maximumToBet));
+					declineTrade();
+					return;
+				}
+
 				executeList(playersMoney);
-				
+
 				acceptTrade();
 			}
 
@@ -128,18 +136,15 @@ public class Main {
 			public void onTradeAccept() {
 				super.onTradeAccept();
 				this.closeTimer();
-				jackpot.bet((int)playerID, OponentGold);
-				jackpot.setPlayersMoney(playerID,jackpot.getPlayersMoney(playerID)-MyGold);
-				try
-				{
+				jackpot.bet((int) playerID, OponentGold);
+				jackpot.setPlayersMoney(playerID, jackpot.getPlayersMoney(playerID) - MyGold);
+				try {
 					String name = GameData.maps.get(jackpotBot.mapId).Players.get(playerID).Name;
-					jackpotBot.send(new Packet("say "+name+" vsadil "+OponentGold));
-				}
-				catch(Exception e)
-				{
+					jackpotBot.send(new Packet("say " + name + " vsadil " + OponentGold));
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
+
 				// He accepted
 				// this.playerID
 				// this.OponentGold
@@ -152,9 +157,8 @@ public class Main {
 			}
 
 		};
-		
-		TradeHandler JHandlerBank = new TradeHandler(bankBot)
-		{
+
+		TradeHandler JHandlerBank = new TradeHandler(bankBot) {
 
 			@Override
 			public void onRequestAccept() {
@@ -174,39 +178,60 @@ public class Main {
 				// He accepted
 				// this.playerID
 				// this.OponentGold
-				System.out.println("Bank succesfully got "+this.OponentGold+" gold.");
+				System.out.println("Bank succesfully got " + this.OponentGold + " gold.");
 			}
 
 		};
-		
+		TalkHandler JHandlerTalk = new TalkHandler(jackpotBot) {
+			@Override
+			public void onPM(long id,String name, String content) {
+				if (content.contains("/balance")) {
+					pm(name, "Na svém kontì máš: " + jackpot.getPlayersMoney(id) + " zlata");
+				}
+
+				if (content.contains("/info")) {
+
+					pm(name, "Nostale Jackpot");
+					pm(name, "Každé kolo je jeden vítìz. Nové kolo je vždy každou minutu.");
+					pm(name, "Vítìz vyhrává vše a 7.5% je poplatek.");
+					pm(name, "Vsadit mùžeš tak, když mi dáš ve výmìnì urèitý poèet penìz.");
+					pm(name, "Výherce dostane peníze pøi další výmìnì (mùže být prázdná)");
+					pm(name, "Maximální výše sázky je 50kk, minimum je 1 zlato");
+					pm(name, "Za ztrátu penìz neberu odpovìdnost. (Ale neokradu vás zámìrnì)");
+					pm(name, "Pøíkazy: ");
+					pm(name, "/balance - zobrazí stav konta");
+				}
+
+			}
+		};
 		while (run) {
 			jackpotBot.receive();
 			JHandlerTrade.parse();
 			JHandlerMapData.parse();
+			JHandlerTalk.parse();
 			jackpotBot.clear();
-			
+
 			bankBot.receive();
 			JHandlerBank.parse();
 			bankBot.clear();
-			
-			if(jackpot.getPlayersMoney(bankBot.id)>10000)
-			{
+
+			if (jackpot.getPlayersMoney(bankBot.id) > 10000) {
 				JHandlerBank.createRequest(jackpotBot.id);
 			}
 		}
-		
+		try {
+			jackpotBot.c.Close();
+			bankBot.c.Close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void main(String args[]) {
 		Resources.load();
-		botThread = new Thread(new Runnable() {
-		@Override
-		public void run()
-		{
-			theBot();
-		}});  
-		
-		
+
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String read = "";
 		String[] splited = new String[1];
@@ -221,6 +246,12 @@ public class Main {
 			}
 
 			if (splited[0].equals("start")) {
+				botThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						theBot();
+					}
+				});
 				run = true;
 				botThread.start();
 				System.out.println("Starting");
@@ -230,6 +261,7 @@ public class Main {
 					run = false;
 					try {
 						botThread.join(1000);
+						botThread.interrupt();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -237,10 +269,16 @@ public class Main {
 					run = true;
 					botThread = new Thread(new Runnable() {
 						@Override
-						public void run()
-						{
+						public void run() {
 							theBot();
-						}});  
+						}
+					});
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					botThread.start();
 					System.out.println("Restarted");
 				} else {
