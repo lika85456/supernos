@@ -17,8 +17,9 @@ import nostale.data.Character;
 
 public class LoginHandler extends Handler {
 	public AccountData accData;
-	private String HASH = "034D977451B01B474FF737EAA89E84E80A85BC5DBE6D49576D327A30E71A1460";
-	private String version = "0.9.3.3080";
+	//md5(nostalex.dat)+md5(nostale.dat)
+	private String HASH = "12972B86463CB2323B1B3CE265C41BD2D1A8D3C8D4EA07DB5BA72625EDDFC94E";
+	private String version = "0.9.3.3081";
 	private Connection c;
 	private Server s;
 	private GameServer[] channels;

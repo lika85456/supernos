@@ -54,7 +54,7 @@ public class Jackpot {
 		Log.log("jackpot", "Bet from:" + playerID + " gold:" + gold);
 	}
 
-	public int getPlayersMoney(int playerID) {
+	public int getPlayersMoney(long playerID) {
 		for (String[] d : players.data) {
 			if (d[0].equals(String.valueOf(playerID)))
 				return Integer.parseInt(d[1]);
@@ -62,7 +62,7 @@ public class Jackpot {
 		return 0;
 	}
 
-	public void setPlayersMoney(int playerID, int gold) {
+	public void setPlayersMoney(long playerID, int gold) {
 		Boolean set = false;
 		try {
 			for (String[] d : players.data) {
@@ -83,7 +83,7 @@ public class Jackpot {
 	}
 
 	public int getWinner() {
-
+		save();
 		int winningNumber = (int) (random.nextDouble() * total);
 		int sum = 0;
 		int sum1 = 0;
@@ -93,20 +93,19 @@ public class Jackpot {
 				int winnerId = Integer.valueOf(bet[0]);
 				// int go = Integer.valueOf(bet[1]);
 				Log.log("jackpot", "Winner is: " + winnerId + " with:" + bet[1] + " gold");
-				int winnersMoney = getPlayersMoney(winnerId);
+				long winnersMoney = getPlayersMoney(winnerId);
 				// if(winnersMoney!=0)
 				// Log.log("jackpot", "WTF!! this guy:"+winnerId+" has:
 				// "+winnersMoney+" even he won right now");
 				float moneyToSet = winnersMoney + (total / 100f * 92.5f);
 				setPlayersMoney(winnerId, (int) moneyToSet);
 				newRound();
-				save();
 				total = 0;
 				return winnerId;
 			}
 		}
 		total = 0;
-		save();
+		
 		return -1;
 	}
 

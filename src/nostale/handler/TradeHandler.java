@@ -1,5 +1,8 @@
 package nostale.handler;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import nostale.domain.RequestExchangeType;
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IHandler;
@@ -12,9 +15,19 @@ public class TradeHandler extends Handler implements ITradeHandler, IHandler {
 	public long playerID;
 	public String playerName;
 	public int OponentGold = 0;
+	public int MyGold = 0;
+	public int tradeId = 0;
+	public Timer timer;
+	public TimerTask timerTask;
 	private RequestExchangeType MyStatus = RequestExchangeType.Unknown;
 	private RequestExchangeType OponentStatus = RequestExchangeType.Unknown;
 
+	public void closeTimer()
+	{
+		timer.cancel();
+		timerTask.cancel();
+	}
+	
 	public TradeHandler(Player p) {
 		super(p);
 	}
@@ -52,8 +65,10 @@ public class TradeHandler extends Handler implements ITradeHandler, IHandler {
 
 	@Override
 	public void onRequest(Packet p) {
+		if(isTrading()) return;
 		String parse = p.getParameter(1);
 		this.playerID = Long.parseLong(parse.split("\\^")[2]);
+		tradeId++;
 	}
 
 	@Override
@@ -86,17 +101,21 @@ public class TradeHandler extends Handler implements ITradeHandler, IHandler {
 
 	@Override
 	public void declineRequest() {
-		this.isTrading = false;
+		
+		
 		this.MyStatus = RequestExchangeType.Unknown;
 		this.OponentStatus = RequestExchangeType.Unknown;
+		if(!isTrading()) return;
+		this.isTrading = false;
 		player.send(generateAnswer(false));
 	}
 
 	@Override
 	public void declineTrade() {
-		this.isTrading = false;
 		this.MyStatus = RequestExchangeType.Unknown;
 		this.OponentStatus = RequestExchangeType.Unknown;
+		if(!isTrading()) return;
+		this.isTrading = false;
 		player.send(new Packet("req_exc 4"));
 	}
 
@@ -104,6 +123,7 @@ public class TradeHandler extends Handler implements ITradeHandler, IHandler {
 	public void executeList(int gold) {
 		player.send(new Packet("exc_list " + gold));
 		this.MyStatus = RequestExchangeType.Confirmed;
+		this.MyGold = gold;
 	}
 
 	@Override

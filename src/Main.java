@@ -1,5 +1,13 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import nostale.data.AccountData;
 import nostale.data.CServer;
+import nostale.data.GameData;
 import nostale.gameobject.Player;
 import nostale.handler.LoginHandler;
 import nostale.handler.MapDataHandler;
@@ -9,50 +17,129 @@ import nostale.resources.Resources;
 
 public class Main {
 
-	public static void main(String args[]) {
-		Resources.load();
-		Player brgeoad = new Player();
-		AccountData brgeoadAccountData = new AccountData();
-		brgeoadAccountData.nickname = "Zadek512";
-		brgeoadAccountData.password = "Computer1";
-		brgeoadAccountData.Channel = 5;
-		brgeoadAccountData.Server = 1;
-		brgeoadAccountData.Character = 1;
-		brgeoadAccountData.Nation = CServer.CZ;
-		brgeoad.accData = brgeoadAccountData;
+	public static Boolean consoleReaderRead = true;
 
-		LoginHandler login = new LoginHandler(brgeoad);
-		login = null;
-		MapDataHandler mapData = new MapDataHandler(brgeoad);
-		TradeHandler trade = new TradeHandler(brgeoad) {
+	public static Boolean run = false;
+
+	public static Thread botThread;
+	
+	public static Player bankBot;
+	public static Player jackpotBot;
+	public static TradeHandler bankBotTrade;
+	public static TradeHandler jackpotBotTrade = null;
+	public static Jackpot jackpot;
+	
+	public static HashMap<Long,Long> banList = new HashMap<Long,Long>();
+	
+	public static void theBot() {
+		jackpot = new Jackpot();
+		jackpot.load();
+		bankBot = new Player();
+		jackpotBot = new Player();
+		AccountData bankAccData = new AccountData();
+		bankAccData.nickname = "Zadek512";
+		bankAccData.password = "Computer1";
+		bankAccData.Channel = 5;
+		bankAccData.Server = 1;
+		bankAccData.Character = 1;
+		bankAccData.Nation = CServer.CZ;
+		
+		AccountData jackpotAccData = new AccountData();
+		// nostaleJackpot@post.cz Computer1
+		jackpotAccData.nickname = "NostaleJackpot58";
+		jackpotAccData.password = "951852QwErTy";
+		jackpotAccData.Channel = 5;
+		jackpotAccData.Server = 1;
+		jackpotAccData.Character = 1;
+		jackpotAccData.Nation = CServer.CZ;
+		
+		bankBot.accData = bankAccData;
+		jackpotBot.accData = jackpotAccData;
+		
+		LoginHandler tLogin = new LoginHandler(bankBot);
+		tLogin = null;
+		tLogin = new LoginHandler(jackpotBot);
+		tLogin = null;
+		MapDataHandler JHandlerMapData = new MapDataHandler(jackpotBot);
+		TradeHandler JHandlerTrade = new TradeHandler(jackpotBot) {
+
 			@Override
 			public void onRequest(Packet p) {
-				// TODO if is blocked dont accept
 				super.onRequest(p);
+				//If he is trading more than 10 secs ban him!
+				int tradeID = this.tradeId;
+				TradeHandler tt = this;
+				this.timer = new Timer();				
+				this.timerTask = new TimerTask() {
+				    @Override
+				    public void run() {
+		                if(tt.tradeId == tradeID)
+		                {
+		                	banList.put(playerID, System.currentTimeMillis()+10000);
+		                	declineTrade();
+		                	
+		                }
+				    };
+				};
+				timer.schedule(timerTask,10000);
+				
+				
+				if(banList.containsKey(playerID))
+				{
+					Long time = banList.get(playerID);
+					if(time<System.currentTimeMillis()) //unban
+					{
+						banList.remove(playerID);
+						
+					}
+					else
+					{
+						//TODO send him a message that he is banned for X seconds
+						declineRequest();
+						return;
+					}
+				}
 				acceptRequest();
 				// this.playerID
+				banList.put(playerID, System.currentTimeMillis()+5000);
 			}
 
 			@Override
 			public void onRequestAccept() {
-				super.onRequestAccept();
-				// nothing, wait until he sets his list
+				super.onRequestAccept(); // i am not sending any requests???
 			}
 
 			@Override
 			public void onExecuteList(int gold) {
 				super.onExecuteList(gold);
 				// Do something
-				executeList(0);
-				if (gold > 0)
-					acceptTrade();
-				else
+				int playersMoney = jackpot.getPlayersMoney(playerID);
+				if(playersMoney==0 && gold==0)
+				{
 					declineTrade();
+					return;
+				}
+				executeList(playersMoney);
+				
+				acceptTrade();
 			}
 
 			@Override
 			public void onTradeAccept() {
 				super.onTradeAccept();
+				this.closeTimer();
+				jackpot.bet((int)playerID, OponentGold);
+				jackpot.setPlayersMoney(playerID,jackpot.getPlayersMoney(playerID)-MyGold);
+				try
+				{
+					String name = GameData.maps.get(jackpotBot.mapId).Players.get(playerID).Name;
+					jackpotBot.send(new Packet("say "+name+" vsadil "+OponentGold));
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+				
 				// He accepted
 				// this.playerID
 				// this.OponentGold
@@ -61,15 +148,123 @@ public class Main {
 			@Override
 			public void onTradeDecline() {
 				super.onTradeDecline();
-				// Ban that dick
+				this.closeTimer();
 			}
 
 		};
-		while (true) {
-			brgeoad.receive();
-			mapData.parse();
-			trade.parse();
-			brgeoad.clear();
+		
+		TradeHandler JHandlerBank = new TradeHandler(bankBot)
+		{
+
+			@Override
+			public void onRequestAccept() {
+				super.onRequestAccept();
+				executeList(0);
+			}
+
+			@Override
+			public void onExecuteList(int gold) {
+				super.onExecuteList(gold);
+				acceptTrade();
+			}
+
+			@Override
+			public void onTradeAccept() {
+				super.onTradeAccept();
+				// He accepted
+				// this.playerID
+				// this.OponentGold
+				System.out.println("Bank succesfully got "+this.OponentGold+" gold.");
+			}
+
+		};
+		
+		while (run) {
+			jackpotBot.receive();
+			JHandlerTrade.parse();
+			JHandlerMapData.parse();
+			jackpotBot.clear();
+			
+			bankBot.receive();
+			JHandlerBank.parse();
+			bankBot.clear();
+			
+			if(jackpot.getPlayersMoney(bankBot.id)>10000)
+			{
+				JHandlerBank.createRequest(jackpotBot.id);
+			}
+		}
+		
+	}
+
+	public static void main(String args[]) {
+		Resources.load();
+		botThread = new Thread(new Runnable() {
+		@Override
+		public void run()
+		{
+			theBot();
+		}});  
+		
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String read = "";
+		String[] splited = new String[1];
+		while (consoleReaderRead) {
+			try {
+				read = reader.readLine();
+				splited = null;
+				splited = read.split(" ");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			if (splited[0].equals("start")) {
+				run = true;
+				botThread.start();
+				System.out.println("Starting");
+			} else if (read.contains("restart")) {
+				jackpot.save();
+				if (run == true) {
+					run = false;
+					try {
+						botThread.join(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					run = true;
+					botThread = new Thread(new Runnable() {
+						@Override
+						public void run()
+						{
+							theBot();
+						}});  
+					botThread.start();
+					System.out.println("Restarted");
+				} else {
+					System.out.println("Hasn't started yet. So cannot restart");
+				}
+			} else if (read.contains("stop")) {
+				jackpot.save();
+				run = false;
+				try {
+					botThread.join(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("Stopping");
+			} else if (read.contains("info")) {
+				System.out.println("*********INFO*********");
+				System.out.println("***Money: " + bankBot.Gold);
+			} else if (read.contains("save")) {
+				jackpot.save();
+			} else if (read.contains("say")) {
+				jackpotBot.send(new Packet(read));
+			}
+
 		}
 	}
 }
