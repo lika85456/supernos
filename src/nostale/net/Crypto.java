@@ -7,8 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import nostale.util.Log;
+
 public class Crypto {
-	public static String LOG = "";
+
 
 	public static String encrypt(String passwordToHash) {
 		String generatedPassword = null;
@@ -56,23 +58,6 @@ public class Crypto {
 
 		}
 		return returnValue;
-	}
-
-	private static String IntegerArrayToString(int[] input) {
-		String returnValue = "";
-		for (int i = 0; i < input.length; i++) {
-			returnValue += (char) input[i];
-
-		}
-		return returnValue;
-	}
-
-	private static ArrayList<Integer> StringToInt(String str) {
-		ArrayList<Integer> temp = new ArrayList<Integer>();
-		for (int i = 0; i < str.length(); i++) {
-			temp.add((int) str.charAt(i));
-		}
-		return temp;
 	}
 
 	/*
@@ -343,8 +328,8 @@ public class Crypto {
 		String timeStamp = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").format(Calendar.getInstance().getTime());
 		String ms = timeStamp + " " + tag.toUpperCase() + " " + message + "\n";
 		ms.replaceAll("\n+", "\n");
-		Crypto.LOG += ms;
-		System.out.print(ms);
+		Log.log(tag, ms);
+		//System.out.print(ms);
 	}
 
 }

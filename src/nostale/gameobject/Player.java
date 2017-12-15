@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 import nostale.data.AccountData;
 import nostale.data.MapCharacterInstance;
+import nostale.handler.Handler;
 
 public class Player extends MapCharacterInstance{
 	public AccountData accData;
@@ -19,11 +20,10 @@ public class Player extends MapCharacterInstance{
 	public Connection c;
 	public int session;
 	public int mapId;
-	
-	public ArrayList<String> received;
+	public ArrayList<Handler> handlers;
 	public Player()
 	{
-		received = new ArrayList<String>();
+		this.handlers = new ArrayList<Handler>();
 	}
 	
 	public void send(Packet p)
@@ -37,17 +37,22 @@ public class Player extends MapCharacterInstance{
 		}
 	}
 	
-	public void receive()
+	
+	public void addHandler(Handler h)
+	{
+		handlers.add(h);
+	}
+	
+	public void receiveAndParse()
 	{
 		String[] rece = c.getReceived();
 		for(String rec:rece)
 		{
-			received.add(rec);
+			for(Handler handler:handlers)
+			{
+				handler.parsePacket(new Packet(rec));
+			}
 		}
 	}
-	public void clear()
-	{
-		received = null;
-		received = new ArrayList<String>();
-	}
+
 }

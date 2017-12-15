@@ -2,6 +2,9 @@ import java.util.Random;
 
 import Database.Database;
 import Database.Table;
+import nostale.data.GameData;
+import nostale.gameobject.Player;
+import nostale.handler.TalkHandler;
 import nostale.util.Log;
 
 public class Jackpot {
@@ -13,6 +16,7 @@ public class Jackpot {
 	public final int roundLength = 60000;
 	public int total;
 	public Random random;
+	public Boolean state = false;
 	/*
 	 * BETS PLAYER_ID|GOLD
 	 */
@@ -25,11 +29,20 @@ public class Jackpot {
 	 * PLAYERS PLAYER_ID|GOLD
 	 */
 
-	public Jackpot() {
+	/** TIMINGS **/
+	private long lastTimeNewRound = 0;
+	private long lastTimeAd = 0;
+	
+	private static final int ROUND_TIME = 60000;
+	private static final int AD_TIME = 20000;
+	
+	public Player player;
+	public Jackpot(Player player) {
 		random = new Random();
 		bets = new Table();
 		rounds = new Table();
 		players = new Table();
+		player = player;
 	}
 
 	public void save() {
@@ -92,7 +105,7 @@ public class Jackpot {
 			if (winningNumber <= sum1 && winningNumber >= sum) {
 				int winnerId = Integer.valueOf(bet[0]);
 				// int go = Integer.valueOf(bet[1]);
-				Log.log("jackpot", "Winner is: " + winnerId + " with:" + bet[1] + " gold");
+				Main.println("JACKPOT Winner is: " + winnerId + " with:" + bet[1] + " gold");
 				long winnersMoney = getPlayersMoney(winnerId);
 				// if(winnersMoney!=0)
 				// Log.log("jackpot", "WTF!! this guy:"+winnerId+" has:
@@ -113,5 +126,22 @@ public class Jackpot {
 		rounds.add(new String[] { bets.dataToString() });
 		bets = new Table();
 		Log.log("jackpot", "New round number: " + rounds.data.size());
+	}
+	
+	public void parse(TalkHandler talkHandler)
+	{
+		long time = System.currentTimeMillis();
+		if(lastTimeNewRound+ROUND_TIME<time && state==true)
+		{
+			lastTimeNewRound = time;
+			int id = getWinner();
+			try {
+				talkHandler.say("Kolo je u konce a výherce je: "+GameData.maps.get(player.mapId).Players.get(id));
+			}
+			catch(Exception e)
+			{
+				talkHandler.say("Kolo je u konce a výherce je: ERROR_UNKNOWN");
+			}
+		}
 	}
 }

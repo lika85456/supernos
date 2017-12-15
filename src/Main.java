@@ -15,11 +15,12 @@ import nostale.handler.TalkHandler;
 import nostale.handler.TradeHandler;
 import nostale.packet.Packet;
 import nostale.resources.Resources;
+import nostale.util.Log;
 
 public class Main {
 
 	public static Boolean consoleReaderRead = true;
-
+	public static Boolean debug = true;
 	public static Boolean run = false;
 
 	public static Thread botThread;
@@ -29,14 +30,15 @@ public class Main {
 	public static TradeHandler bankBotTrade;
 	public static TradeHandler jackpotBotTrade = null;
 	public static Jackpot jackpot;
-
 	public static HashMap<Long, Long> banList = new HashMap<Long, Long>();
 
 	public static void theBot() {
-		jackpot = new Jackpot();
-		jackpot.load();
+
+
 		bankBot = new Player();
 		jackpotBot = new Player();
+		jackpot = new Jackpot(jackpotBot);
+		jackpot.load();
 		AccountData bankAccData = new AccountData();
 		bankAccData.nickname = "Zadek512";
 		bankAccData.password = "Computer1";
@@ -62,6 +64,7 @@ public class Main {
 		tLogin = new LoginHandler(jackpotBot);
 		tLogin = null;
 		MapDataHandler JHandlerMapData = new MapDataHandler(jackpotBot);
+		jackpotBot.addHandler(JHandlerMapData);
 		TradeHandler JHandlerTrade = new TradeHandler(jackpotBot) {
 
 			@Override
@@ -77,6 +80,7 @@ public class Main {
 						if (tt.tradeId == tradeID) {
 							banList.put(playerID, System.currentTimeMillis() + 10000);
 							declineTrade();
+							println("Banning "+playerID+" for 10 secs (waiter)");
 
 						}
 					};
@@ -98,7 +102,8 @@ public class Main {
 				}
 				acceptRequest();
 				// this.playerID
-				banList.put(playerID, System.currentTimeMillis() + 5000);
+				println("Banning "+playerID+" for 10 secs");
+				banList.put(playerID, System.currentTimeMillis() + 10000);
 			}
 
 			@Override
@@ -157,7 +162,7 @@ public class Main {
 			}
 
 		};
-
+		jackpotBot.addHandler(JHandlerTrade);
 		TradeHandler JHandlerBank = new TradeHandler(bankBot) {
 
 			@Override
@@ -178,10 +183,12 @@ public class Main {
 				// He accepted
 				// this.playerID
 				// this.OponentGold
-				System.out.println("Bank succesfully got " + this.OponentGold + " gold.");
+				println("Bank succesfully got " + this.OponentGold + " gold.");
 			}
 
 		};
+		bankBot.addHandler(JHandlerBank);
+
 		TalkHandler JHandlerTalk = new TalkHandler(jackpotBot) {
 			@Override
 			public void onPM(long id,String name, String content) {
@@ -204,20 +211,16 @@ public class Main {
 
 			}
 		};
+		jackpotBot.addHandler(JHandlerTalk);
+		
 		while (run) {
-			jackpotBot.receive();
-			JHandlerTrade.parse();
-			JHandlerMapData.parse();
-			JHandlerTalk.parse();
-			jackpotBot.clear();
-
-			bankBot.receive();
-			JHandlerBank.parse();
-			bankBot.clear();
+			jackpotBot.receiveAndParse();
+			bankBot.receiveAndParse();
 
 			if (jackpot.getPlayersMoney(bankBot.id) > 10000) {
 				JHandlerBank.createRequest(jackpotBot.id);
 			}
+			jackpot.parse(JHandlerTalk);
 		}
 		try {
 			jackpotBot.c.Close();
@@ -254,8 +257,8 @@ public class Main {
 				});
 				run = true;
 				botThread.start();
-				System.out.println("Starting");
-			} else if (read.contains("restart")) {
+				println("Starting");
+			} else if (splited[0].equals("restart")) {
 				jackpot.save();
 				if (run == true) {
 					run = false;
@@ -280,11 +283,11 @@ public class Main {
 						e.printStackTrace();
 					}
 					botThread.start();
-					System.out.println("Restarted");
+					println("Restarted");
 				} else {
-					System.out.println("Hasn't started yet. So cannot restart");
+					println("Hasn't started yet. So cannot restart");
 				}
-			} else if (read.contains("stop")) {
+			} else if (splited[0].equals("stop")) {
 				jackpot.save();
 				run = false;
 				try {
@@ -293,17 +296,49 @@ public class Main {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("Stopping");
-			} else if (read.contains("info")) {
-				System.out.println("*********INFO*********");
-				System.out.println("***Money: " + bankBot.Gold);
-			} else if (read.contains("save")) {
+				println("Stopping");
+			} else if (splited[0].equals("info")) {
+				println("*********INFO*********");
+				println("***Money: " + bankBot.Gold);
+				println("***Players on the map: "+GameData.maps.get(jackpotBot.mapId).Players.size());
+				
+			} else if (splited[0].equals("save")) {
 				jackpot.save();
-			} else if (read.contains("say")) {
+			} else if (splited[0].equals("say")) {
 				jackpotBot.send(new Packet(read));
+			}
+			else if(splited[0].equals("log_debug=true"))
+			{
+				Log.debug = true;
+			}
+			else if(splited[0].equals("log_debug=false"))
+			{
+				Log.debug = false;
+			}
+			else if(splited[0].equals("debug=true"))
+			{
+				debug = true;
+			}
+			else if(splited[0].equals("debug=false"))
+			{
+				debug = false;
+			}
+			else if(splited[0].equals("jackpot=true"))
+			{
+				jackpot.state = true;
+			}
+			else if(splited[0].equals("jackpot=false"))
+			{
+				jackpot.state = false;
 			}
 
 		}
+	}
+	
+	public static void println(String message)
+	{
+		if(debug)
+			System.out.println(message);
 	}
 }
 
@@ -323,15 +358,15 @@ public class Main {
  * { // TODO Auto-generated catch block e.printStackTrace(); }
  * 
  * if (read.contains("start")) { stateStart = true;
- * System.out.println("Starting"); } else if (read.contains("restart")) { if
+ * println("Starting"); } else if (read.contains("restart")) { if
  * (stateStart == true) { stateStart = false; while (succesfullyEnd == false) {
  * try { Thread.sleep(10); } catch (InterruptedException e) { // TODO
  * Auto-generated catch block e.printStackTrace(); } } main(null);
- * succesfullyEnd = false; stateStart = true; System.out.println("Restarted"); }
- * else { System.out.println("Havent started yet. So cannot restart"); } } else
+ * succesfullyEnd = false; stateStart = true; println("Restarted"); }
+ * else { println("Havent started yet. So cannot restart"); } } else
  * if (read.contains("stop")) { stateStart = false;
- * System.out.println("Stopping"); } else if (read.contains("info")) {
- * System.out.println("*********INFO*********"); System.out.println("***Money: "
+ * println("Stopping"); } else if (read.contains("info")) {
+ * println("*********INFO*********"); println("***Money: "
  * + banka.Gold); } else if (read.contains("save")) { jackpot.save(); } else if
  * (read.contains("say")) { jackpotBot.send(read); }
  * 
@@ -514,7 +549,7 @@ public class Main {
  * Iterator it =
  * jackpotBot.gameData.map[jackpotBot.gameDataMapID].Players.entrySet().iterator
  * (); while (it.hasNext()) { Map.Entry pair = (Map.Entry) it.next();
- * System.out.println("Admin on map"); jackpotBot.send( "say " +
+ * println("Admin on map"); jackpotBot.send( "say " +
  * ((MapCharacterInstance) pair.getValue()).Name + " Pozor, na mapì je admin!");
  * 
  * }
@@ -568,7 +603,7 @@ public class Main {
  * 
  * } // if both 3 then trade is good if 3 and 4/5 then canceled if
  * (jackpotBotTrade.MyStatus == 3 && jackpotBotTrade.OponentStatus == 3) { //
- * Good, trade was done // System.out.println("Good"); jackpotBotTrade.MyStatus
+ * Good, trade was done // println("Good"); jackpotBotTrade.MyStatus
  * = 10; // brgeoad.tradeHandler.trade = null;
  * jackpot.bet(jackpotBotTrade.playerID, jackpotBotTrade.goldFromPlayer);
  * 
@@ -580,7 +615,7 @@ public class Main {
  * } if ((jackpotBotTrade.MyStatus == 4 || jackpotBotTrade.MyStatus == 5 ||
  * jackpotBotTrade.OponentStatus == 4 || jackpotBotTrade.OponentStatus == 5) &&
  * jackpotBotTrade.MyStatus != 10) { // Bad, trade was declined //
- * System.out.println("Bad"); jackpotBotTrade.MyStatus = 10; //
+ * println("Bad"); jackpotBotTrade.MyStatus = 10; //
  * brgeoad.tradeHandler.trade = null; } } else//Put my money into the "bank" {
  * if(totalToPutIntoTheBank>0 && putting == false) { //totalToPutIntoTheBank =
  * 0; putting = true; bankTrade = new Trade(banka);
