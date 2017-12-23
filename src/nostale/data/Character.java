@@ -3,12 +3,15 @@ package nostale.data;
 import nostale.domain.ClassType;
 
 public class Character {
+	public long JobMaxXP;
+	public long LevelMaxXP;
 	public long AccountId;
-
+	public byte Direction;
 	public int Act4Dead;
-
+	public byte Authority;
 	public int Act4Kill;
-
+	public Boolean IsSitting;
+	public Boolean IsInvisible;
 	public int Act4Points;
 
 	public int ArenaWinner;
@@ -43,7 +46,7 @@ public class Character {
 
 	public long HeroXp;
 
-	public int Hp;
+	public int HP;
 
 	public Boolean HpBlocked;
 
@@ -55,8 +58,8 @@ public class Character {
 
 	public long LevelXp;
 
-	public short MapId;
-
+	public int MaxHP;
+	public int MaxMP;
 	public short MapX;
 
 	public short MapY;
@@ -75,7 +78,7 @@ public class Character {
 
 	public Boolean MouseAimLock;
 
-	public int Mp;
+	public int MP;
 
 	public String Name;
 
@@ -97,5 +100,7 @@ public class Character {
 
 	public int TalentWin;
 
+	public int Speed;
+	
 	public Boolean WhisperBlocked;
 }

@@ -1,11 +1,20 @@
 package nostale.handler;
 
-import nostale.gameobject.Player;
+import java.util.ArrayList;
 
-public class Handler {
+import nostale.gameobject.Player;
+import nostale.packet.Packet;
+
+public class Handler{
 	protected Player player;
+
+	public void parsePacket(Packet p)
+	{
+		
+	}
 
 	public Handler(Player p) {
 		player = p;
 	}
+
 }

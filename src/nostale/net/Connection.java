@@ -73,7 +73,7 @@ public class Connection {
 		// outToServer.writeBytes(packet);
 		for (int i = 0; i < packet.length(); i++) {
 			char c = packet.charAt(i);
-			byte first = (byte) (c >> 8 << 8);
+			//byte first = (byte) (c >> 8 << 8);
 			byte second = (byte) (c << 8 >> 8);
 			outToServer.writeByte(second);
 			// System.out.println("First: "+first+" Second: "+second);

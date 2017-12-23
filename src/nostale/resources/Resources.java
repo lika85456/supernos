@@ -24,15 +24,15 @@ public class Resources {
 	private static HashMap<Integer, NpcMonster> mobs;
 	private static Boolean loaded = false;
 
-	public Skill getSkill(Integer id) {
+	public static Skill getSkill(Integer id) {
 		return skills.get(id);
 	}
 
-	public Item getItem(Integer id) {
+	public static Item getItem(Integer id) {
 		return items.get(id);
 	}
 
-	public NpcMonster getMob(Integer id) {
+	public static NpcMonster getMob(Integer id) {
 		return mobs.get(id);
 	}
 
