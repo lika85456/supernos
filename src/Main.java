@@ -230,6 +230,8 @@ public class Main {
 	}
 
 	public static void main(String args[]) {
+		
+		
 		Resources.load();
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -255,7 +257,7 @@ public class Main {
 				run = true;
 				botThread.start();
 				System.out.println("Starting");
-			} else if (read.contains("restart")) {
+			} else if (splited[0].equals("restart")) {
 				jackpot.save();
 				if (run == true) {
 					run = false;
@@ -284,7 +286,7 @@ public class Main {
 				} else {
 					System.out.println("Hasn't started yet. So cannot restart");
 				}
-			} else if (read.contains("stop")) {
+			} else if (splited[0].equals("stop")) {
 				jackpot.save();
 				run = false;
 				try {
@@ -294,13 +296,16 @@ public class Main {
 					e.printStackTrace();
 				}
 				System.out.println("Stopping");
-			} else if (read.contains("info")) {
+			} else if (splited[0].equals("info")) {
 				System.out.println("*********INFO*********");
 				System.out.println("***Money: " + bankBot.Gold);
-			} else if (read.contains("save")) {
+			} else if (splited[0].equals("save")) {
 				jackpot.save();
-			} else if (read.contains("say")) {
+			} else if (splited[0].equals("say")) {
 				jackpotBot.send(new Packet(read));
+			} else if(splited[0].equals("map_info"))
+			{
+				GameData.maps.get(jackpotBot.mapId).Players.forEach((k,v) -> System.out.println("PlayerID: "+k+" Name:"+v.Name+" Rank:"+v.Authority));
 			}
 
 		}
