@@ -23,6 +23,18 @@ public class Resources {
 	private static HashMap<Integer, Item> items;
 	private static HashMap<Integer, NpcMonster> mobs;
 	private static Boolean loaded = false;
+	
+	/*public static Item[] getDrop(NpcMonster monster)
+	{
+		Item[] toRet = new Item[monster.Drop.length];
+		for(int i = 0;i<monster.Drop.length;i++)
+		{
+			toRet[i] = Resources.getItem(monster.Drop[i]);
+		}
+		return toRet;
+	}
+	
+	*/
 
 	public static Skill getSkill(Integer id) {
 		return skills.get(id);
@@ -324,7 +336,21 @@ public class Resources {
 						npc.AttackUpgrade = Short.parseShort(unknownData == 1 ? currentLine[2] : currentLine[4]);
 					} else if (currentLine.length > 3 && currentLine[1].equals("AINFO")) {
 						npc.DefenceUpgrade = Short.parseShort(unknownData == 1 ? currentLine[2] : currentLine[3]);
-					}
+					} /*else if (currentLine[1].equals("ITEM")) {
+
+						int pos = line.indexOf("1	-1	0	0	-1");
+						if (pos > 0) {
+
+							String tempLine[] = line.substring(0, pos).split("\\s+");
+							if (tempLine.length > 2) {
+
+								npc.Drop = new int[tempLine.length - 2];
+								for (int iii = 2; iii < tempLine.length; iii++) {
+									npc.Drop[iii - 2] = Integer.parseInt(currentLine[iii]);
+								}
+							}
+						}
+					}*/
 
 				}
 

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nostale.Config;
 import nostale.data.AccountData;
 import nostale.data.GameServer;
 import nostale.data.Server;
@@ -18,8 +19,8 @@ import nostale.data.Character;
 public class LoginHandler extends Handler {
 	public AccountData accData;
 	//md5(nostalex.dat)+md5(nostale.dat)
-	private String HASH = "12972B86463CB2323B1B3CE265C41BD2D1A8D3C8D4EA07DB5BA72625EDDFC94E";
-	private String version = "0.9.3.3081";
+	private String HASH = Config.HASH;
+	private String version = Config.version;
 	private Connection c;
 	private Server s;
 	private GameServer[] channels;

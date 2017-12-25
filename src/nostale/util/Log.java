@@ -9,7 +9,7 @@ public class Log {
 	private static String log = "";
 	private static int logCall = 0;
 	private static final int callsToSave = 50;
-
+	public static Boolean debug = false;
 	public static String getLog() {
 		return log;
 	}
@@ -18,7 +18,8 @@ public class Log {
 		logCall++;
 		String tLog = Log.getCurrentTimeStamp() + " " + type.toUpperCase() + "->" + content + "\n";
 		log += tLog;
-		System.out.println(tLog);
+		if(debug)
+			System.out.println(tLog);
 		if (logCall > callsToSave) {
 			logCall = 0;
 			save();

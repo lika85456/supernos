@@ -87,4 +87,6 @@ public class NpcMonster {
 	public short WaterResistance;
 
 	public int XP;
+	
+	public int[] Drop;
 }

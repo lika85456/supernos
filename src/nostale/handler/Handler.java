@@ -17,10 +17,4 @@ public class Handler{
 		player = p;
 	}
 
-	public void parse() {
-		ArrayList<String> toParse = player.received;
-		for (String po : toParse) {
-		parsePacket(new Packet(po));
-		}
-	}
 }
