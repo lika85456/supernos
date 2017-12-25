@@ -326,7 +326,7 @@ public class Crypto {
 
 	public static void addToLog(String tag, String message) {
 		String timeStamp = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss").format(Calendar.getInstance().getTime());
-		String ms = timeStamp + " " + tag.toUpperCase() + " " + message + "\n";
+		String ms = timeStamp + " " + tag.toUpperCase() + " " + message;
 		ms.replaceAll("\n+", "\n");
 		Log.log(tag, ms);
 		//System.out.print(ms);

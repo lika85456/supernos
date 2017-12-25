@@ -19,7 +19,7 @@ public class Log {
 		String tLog = Log.getCurrentTimeStamp() + " " + type.toUpperCase() + "->" + content + "\n";
 		log += tLog;
 		if(debug)
-			System.out.println(tLog);
+			System.out.print(tLog);
 		if (logCall > callsToSave) {
 			logCall = 0;
 			save();

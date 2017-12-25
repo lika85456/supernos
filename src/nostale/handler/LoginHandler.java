@@ -11,12 +11,15 @@ import nostale.data.AccountData;
 import nostale.data.GameServer;
 import nostale.data.Server;
 import nostale.domain.ClassType;
+import nostale.domain.LoginFailType;
 import nostale.gameobject.Player;
+import nostale.handler.interfaces.ILoginHandler;
 import nostale.net.Connection;
 import nostale.net.Crypto;
+import nostale.packet.Packet;
 import nostale.data.Character;
 
-public class LoginHandler extends Handler {
+public class LoginHandler extends Handler implements ILoginHandler{
 	public AccountData accData;
 	//md5(nostalex.dat)+md5(nostale.dat)
 	private String HASH = Config.HASH;
@@ -117,6 +120,9 @@ public class LoginHandler extends Handler {
 
 			if (!packet.contains("TeST")) {
 				System.out.println(packet);
+				Packet p  =new Packet(packet);
+				onError(new LoginFailType(p.getIntParameter(1)));
+				return;
 			}
 			String[] p = packet.split(" ");
 			this.session = Integer.parseInt(p[2]);
@@ -200,5 +206,51 @@ public class LoginHandler extends Handler {
 		chara.JobLevel = (byte) Integer.parseInt(p[12]);
 
 		return chara;
+	}
+
+	@Override
+	public void onError(LoginFailType error) {
+		/*
+		 * 	public static final byte OldClient = 1;
+	public static final byte UnhandledError = 2;
+	public static final byte Maintenance = 3;
+	public static final byte AlreadyConnected = 4;
+	public static final byte AccountOrPasswordWrong = 5;
+	public static final byte CantConnect = 6;
+	public static final byte Banned = 7;
+	public static final byte WrongCountry = 8;
+	public static final byte WrongCaps = 9;
+		 */
+			System.out.println("Cannot login because ");
+			switch(error.type)
+			{
+			case LoginFailType.OldClient:
+				System.out.println("old client!");
+				break;
+			case LoginFailType.UnhandledError:
+				System.out.println("unhandled error!");
+				break;
+			case LoginFailType.Maintenance:
+				System.out.println("maintenance!");
+				break;
+			case LoginFailType.AlreadyConnected:
+				System.out.println("already connected!");
+				break;
+			case LoginFailType.AccountOrPasswordWrong:
+				System.out.println("account or password wrong!");
+				break;
+			case LoginFailType.CantConnect:
+				System.out.println("cannot connect!");
+				break;
+			case LoginFailType.Banned:
+				System.out.println("banned!");
+				break;
+			case LoginFailType.WrongCountry:
+				System.out.println("wrong country!");
+				break;
+			case LoginFailType.WrongCaps:
+				System.out.println("wrong caps!");
+				break;
+			}
 	}
 }

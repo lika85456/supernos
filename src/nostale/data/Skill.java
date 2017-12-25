@@ -63,4 +63,6 @@ public class Skill {
 
 	public short UpgradeType;
 
+	public boolean IsOnCooldown;
+
 }

@@ -15,6 +15,7 @@ public class Handler{
 
 	public Handler(Player p) {
 		player = p;
+		p.addHandler(this);
 	}
 
 }

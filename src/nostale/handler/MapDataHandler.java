@@ -1,6 +1,5 @@
 package nostale.handler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import nostale.data.GameData;
@@ -12,11 +11,12 @@ import nostale.data.NpcMonsterInstance;
 import nostale.data.Portal;
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IHandler;
+import nostale.handler.interfaces.IMapDataHandler;
 import nostale.packet.Packet;
 import nostale.resources.Resources;
 import nostale.util.Pos;
 
-public class MapDataHandler extends Handler implements IHandler {
+public class MapDataHandler extends Handler implements IMapDataHandler,IHandler{
 	public MapDataHandler(Player p) {
 		super(p);
 	}
@@ -32,6 +32,7 @@ public class MapDataHandler extends Handler implements IHandler {
 				MapInstance temp = new nostale.data.MapInstance();
 				temp.load(packet.getIntParameter(2));
 				player.mapId = GameData.addMap(temp);
+				onMapChange(temp);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -109,7 +110,7 @@ public class MapDataHandler extends Handler implements IHandler {
 				tChar.id = packet.getIntParameter(4);
 				if (tChar.id != 0)
 					tMap.Players.put((int) tChar.id, tChar);
-
+				onPlayerIn(tChar);
 			} else if (packet.getParameter(1).equals("3")) {// Mob move
 				NpcMonsterInstance t = tMap.Mobs.get(packet.getIntParameter(3));
 				if (t == null)
@@ -215,6 +216,7 @@ public class MapDataHandler extends Handler implements IHandler {
 			tMap.Mobs = new HashMap<Integer, NpcMonsterInstance>();
 			tMap.Items = new HashMap<Integer, MapItemInstance>();
 			tMap.Portals = new HashMap<Integer, Portal>();
+			mapout();
 			break;
 
 		case "rest":
@@ -239,13 +241,37 @@ public class MapDataHandler extends Handler implements IHandler {
 
 		case "eff_ob":
 			// eff_ob -1 -1 0 4269 - when i die
-
+			dead();
 			break;
 
 		}
 		if (tMap != null)
 			GameData.maps.put(tMap.id, tMap);
 
+	}
+
+	@Override
+	public void onMapChange(MapInstance map) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPlayerIn(MapCharacterInstance player) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mapout() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dead() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

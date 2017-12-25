@@ -5,11 +5,13 @@ import nostale.net.Crypto;
 import nostale.packet.Packet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import nostale.data.AccountData;
 import nostale.data.MapCharacterInstance;
+import nostale.data.Skill;
 import nostale.handler.Handler;
 
 public class Player extends MapCharacterInstance{
@@ -20,9 +22,11 @@ public class Player extends MapCharacterInstance{
 	public Connection c;
 	public int session;
 	public int mapId;
+	public HashMap<Integer,Skill> skills;
 	public ArrayList<Handler> handlers;
 	public Player()
 	{
+		skills = new HashMap<Integer,Skill>();
 		this.handlers = new ArrayList<Handler>();
 	}
 	
