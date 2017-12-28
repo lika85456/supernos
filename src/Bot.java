@@ -1,10 +1,13 @@
 import nostale.data.AccountData;
-import nostale.data.CServer;
 import nostale.data.MapCharacterInstance;
+import nostale.data.MapItemInstance;
+import nostale.data.NpcMonsterInstance;
 import nostale.domain.AuthorityType;
 import nostale.gameobject.Player;
+import nostale.handler.BattleHandler;
 import nostale.handler.LoginHandler;
 import nostale.handler.MapDataHandler;
+import nostale.handler.WalkHandler;
 
 public class Bot {
 	public Boolean run = true;
@@ -13,6 +16,7 @@ public class Bot {
 	public Thread thread;
 
 	private void bot() {
+		boolean ShouldSit = false;
 		bot = new Player();
 		bot.accData = botData;
 		LoginHandler botLoginHandler = new LoginHandler(bot);
@@ -39,8 +43,26 @@ public class Bot {
 				stop();
 			}
 		};
+		WalkHandler walkHandler = new WalkHandler(bot);
+		
+		BattleHandler battleHandler = new BattleHandler(bot){
+			public void onMeGettingHit(NpcMonsterInstance mob,int damage){
+				super.onMeGettingHit(mob, damage);
+				if(ShouldSit)
+				{
+					setTarget(mob);
+				}
+			}
+			
+		};
+		
 		while (run) {
 			bot.receiveAndParse();
+			//HP and sitting
+			if(bot.HP<bot.MaxHP*0.8 && bot.HP>bot.MaxHP*0.6)//if less than 80% and higher than 60%
+			{
+				
+			}
 		}
 		try {
 			bot.c.Close();

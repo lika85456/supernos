@@ -54,7 +54,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 				if (pac.getIntParameter(2) != player.id) {
 					return;
 				} // If it isnt me who cares?
-				onMeGettingHit(GameData.maps.get(player.mapId).Mobs.get(pac.getIntParameter(4)));
+				onMeGettingHit(GameData.maps.get(player.mapId).Mobs.get(pac.getIntParameter(4)),pac.getIntParameter(13));
 				player.HP -= pac.getIntParameter(13);
 				player.send(new Packet("ncif 3 " + pac.getIntParameter(4)));
 			} else if (splitedd[1].equals("1")) // Someone attacking something
@@ -78,7 +78,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 					if (pac.getIntParameter(2) == player.id)// I killed it
 					{
 						if (target.id == pac.getIntParameter(4)) {
-							Statistics.mobsKilled++;
+							onSkillHit(pac.getIntParameter(13));
 							onTargetDie();
 							target = null;
 						}
@@ -113,15 +113,14 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	}
 
 	@Override
-	public void onMeGettingHit(NpcMonsterInstance mob) {
-		// TODO Auto-generated method stub
+	public void onMeGettingHit(NpcMonsterInstance mob,int damage) {
+		Statistics.dmgTaked += damage;
 
 	}
 
 	@Override
 	public void onTargetDie() {
-		// TODO Auto-generated method stub
-
+		Statistics.mobsKilled++;
 	}
 
 	@Override
@@ -137,8 +136,8 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	}
 
 	@Override
-	public void onSkillHit() {
-		// TODO Auto-generated method stub
+	public void onSkillHit(int damage) {
+		Statistics.dmgDealed+=damage;
 
 	}
 

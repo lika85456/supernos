@@ -11,7 +11,7 @@ public class Main {
 	public static void main(String args[]) {	
 		AccountData botData = new AccountData();
 		// nostaleJackpot@post.cz Computer1
-		botData.nickname = "Jedle85456";
+		botData.nickname = "Zadek5212";
 		botData.password = "Computer1";
 		botData.Channel = 2;
 		botData.Server = 1;

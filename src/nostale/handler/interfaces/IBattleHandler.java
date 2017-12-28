@@ -8,9 +8,9 @@ public interface IBattleHandler {
 	public void useSkill(Skill skill);
 	public void setTarget(NpcMonsterInstance target);
 	public NpcMonsterInstance getTarget();
-	public void onMeGettingHit(NpcMonsterInstance mob);
+	public void onMeGettingHit(NpcMonsterInstance mob, int damage);
 	public void onTargetDie();
 	public void pickUpItem(MapItemInstance item);
 	public void onItemDrop(MapItemInstance item);
-	public void onSkillHit();
+	public void onSkillHit(int damage);
 }

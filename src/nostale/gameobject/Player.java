@@ -22,6 +22,7 @@ public class Player extends MapCharacterInstance{
 	public Connection c;
 	public int session;
 	public int mapId;
+	public boolean IsMoving = false;
 	public HashMap<Integer,Skill> skills;
 	public ArrayList<Handler> handlers;
 	public Player()
