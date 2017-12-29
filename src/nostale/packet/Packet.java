@@ -4,7 +4,7 @@ public class Packet {
 	public PacketType packetType; // If its received or send
 	public String packetString; // Whole packet in string
 	public String name; // Name of packet, example - walk x x -> name = walk
-	private String[] parameters;
+	protected String[] parameters;
 
 	// Packet restrictors for time
 	public int timeToWait = 0; // in miliseconds time between send delay
@@ -14,6 +14,11 @@ public class Packet {
 	 * 
 	 * @param str
 	 */
+	public static Packet parsePacket(String p)
+	{
+		return null;
+	}
+	
 	public Packet(String str) {
 		this.packetString = str;
 		this.parameters = str.split(" ");

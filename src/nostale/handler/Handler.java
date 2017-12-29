@@ -1,7 +1,5 @@
 package nostale.handler;
 
-import java.util.ArrayList;
-
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IHandler;
 import nostale.packet.Packet;
@@ -9,6 +7,7 @@ import nostale.packet.Packet;
 public class Handler implements IHandler{
 	protected Player player;
 
+	@Override
 	public void parsePacket(Packet p)
 	{
 		

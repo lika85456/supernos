@@ -11,6 +11,7 @@ import nostale.resources.Resources;
 
 public class InventoryHandler extends Handler implements IInventoryHandler{
 	public ArrayList<InventoryItemInstance> inventory;
+	//TODO add wearable instance of weapon, armor etc.
 	private boolean sortopenSent = false;
 	public InventoryHandler(Player p)
 	{
@@ -18,29 +19,18 @@ public class InventoryHandler extends Handler implements IInventoryHandler{
 		inventory = new ArrayList<InventoryItemInstance>();
 	}
 	
+	@Override
 	public void parsePacket(Packet p)
 	{
 		switch(p.name)
 		{
 		case "inv":
+			//TODO
 			if(sortopenSent==false)
 			{
 				sortopenSent=true;
 				player.send(new Packet("sortopen"));
 			}
-			String[] pac = p.packetString.split(" ");
-			int type = Integer.parseInt(pac[1]);
-			for(int i = 2;i < pac.length;i++)
-			{
-				String[] pp = pac[i].split("\\.");
-
-				InventoryItemInstance ti = new InventoryItemInstance();
-				ti.ItemVNum = (short) Integer.parseInt(pp[1]);
-				ti.Slot = (short) Integer.parseInt(pp[0]);
-				ti.Amount = (byte) Integer.parseInt(pp[2]);
-				ti.InventoryType = (byte) type;
-				inventory.add(ti);
-				}
 			break;
 		}
 	}
@@ -65,7 +55,7 @@ public class InventoryHandler extends Handler implements IInventoryHandler{
 	}
 	public void useItem(InventoryItemInstance item)
 	{
-		u_i 1 351883 2 1 0 0 
-		player.send(new Packet("u_i"));
+		//u_i 1 351883 2 1 0 0 
+		//player.send(new Packet("u_i"));
 	}
 }

@@ -1,7 +1,5 @@
 package nostale.handler;
 
-import java.util.ArrayList;
-
 import nostale.Statistics;
 import nostale.data.GameData;
 import nostale.data.MapItemInstance;
@@ -20,6 +18,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 		super(p);
 	}
 
+	@Override
 	public void parsePacket(Packet p) {
 		switch (p.name) {
 		case "ski":

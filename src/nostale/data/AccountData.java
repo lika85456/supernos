@@ -9,6 +9,7 @@ public class AccountData {
 	public int Character;
 	public CServer Nation;
 	
+	@Override
 	public String toString()
 	{
 		String toRet = "";
