@@ -5,9 +5,12 @@ import nostale.data.GameData;
 import nostale.data.MapItemInstance;
 import nostale.data.NpcMonsterInstance;
 import nostale.data.Skill;
+import nostale.domain.UserType;
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IBattleHandler;
 import nostale.packet.Packet;
+import nostale.packet.receive.SkiPacket;
+import nostale.packet.receive.SuPacket;
 import nostale.resources.Resources;
 
 public class BattleHandler extends Handler implements IBattleHandler {
@@ -22,13 +25,9 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	public void parsePacket(Packet p) {
 		switch (p.name) {
 		case "ski":
-			String[] splited = p.packetString.split(" ");
-			for (int i = 3; i < splited.length; i++) {
-				if (splited[i].equals("ski"))
-					continue;
-				
-				player.skills.put(Integer.parseInt(splited[i]),Resources.getSkill(Integer.parseInt(splited[i])));
-
+			SkiPacket temp = new SkiPacket(p.packetString);
+			for (Skill s : temp.generatedSkills) {
+				player.skills.put((int) s.SkillVNum, s);
 			}
 			break;
 		case "sr":
@@ -38,56 +37,34 @@ public class BattleHandler extends Handler implements IBattleHandler {
 			lastSkillRequest = null;
 			break;
 		case "su":
-			Packet pac = p;
-			String[] splitedd = p.packetString.split(" ");
-			// Somebody attacked, get info from that
-			// su 1 {hitRequest.Session.Character.CharacterId} 3 {MapMonsterId}
-			// {hitRequest.Skill.SkillVNum} {hitRequest.Skill.Cooldown}
-			// {hitRequest.Skill.AttackAnimation} {hitRequest.SkillEffect}
-			// {hitRequest.Session.Character.PositionX}
-			// {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)}
-			// {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)} {damage}
-			// {hitmode} {hitRequest.Skill.SkillType - 1}
-			if (splitedd[1].equals("3")) // Monster attacking someone
-			{
-				if (pac.getIntParameter(2) != player.id) {
-					return;
-				} // If it isnt me who cares?
-				onMeGettingHit(GameData.maps.get(player.mapId).Mobs.get(pac.getIntParameter(4)),pac.getIntParameter(13));
-				player.HP -= pac.getIntParameter(13);
-				player.send(new Packet("ncif 3 " + pac.getIntParameter(4)));
-			} else if (splitedd[1].equals("1")) // Someone attacking something
-			{
-				if (pac.getIntParameter(2) == player.id) {
-					player.skills.get(pac.getIntParameter(5)).IsOnCooldown = true;
-				}
-				// su 1 {hitRequest.Session.Character.CharacterId} 3
-				// {MapMonsterId} {hitRequest.Skill.SkillVNum}
-				// {hitRequest.Skill.Cooldown} {hitRequest.SkillCombo.Animation}
-				// {hitRequest.SkillCombo.Effect}
-				// {hitRequest.Session.Character.PositionX}
-				// {hitRequest.Session.Character.PositionY} {(IsAlive ? 1 : 0)}
-				// {(int)((float)CurrentHp / (float)Monster.MaxHP * 100)}
-				// {damage} {hitmode} {hitRequest.Skill.SkillType - 1}
-				// MapMobInstance m = n.GameData.get(pac.getInt(4));
-				// TODO dodìlat!!!
-				if (pac.getIntParameter(11) == 0) // Monster died
-				{
-					GameData.maps.get(player.mapId).Mobs.remove(pac.getIntParameter(4));
-					if (pac.getIntParameter(2) == player.id)// I killed it
-					{
-						if (target.id == pac.getIntParameter(4)) {
-							onSkillHit(pac.getIntParameter(13));
-							onTargetDie();
-							target = null;
-						}
-					}
-				}
+			SuPacket tempSuPacket = new SuPacket(p.packetString);
+			player.send(new Packet("ncif " + tempSuPacket.attackerType.getValue() + " " + tempSuPacket.attackerId));
+			player.send(new Packet("ncif " + tempSuPacket.attackedType.getValue() + " " + tempSuPacket.attackedId));
+			if (tempSuPacket.isAlive == false && tempSuPacket.attackedType == UserType.Monster) {
+				GameData.maps.get(player.mapId).Mobs.remove(tempSuPacket.attackedId);
+			}
+			if (tempSuPacket.isAlive == false && tempSuPacket.attackedId == target.id) {
+				onTargetDie();
+				target = null;
+			}
+			if (tempSuPacket.attackerId != player.id || tempSuPacket.attackedId != player.id
+					|| tempSuPacket.attackedId != target.id) {
+				return;
+			}
+			if (tempSuPacket.attackedType == UserType.Player && tempSuPacket.attackedId == player.id) {
+				player.HP -= tempSuPacket.damage;
+				if (tempSuPacket.attackerType == UserType.Monster)
+					onMeGettingHit(GameData.maps.get(player.mapId).Mobs.get(tempSuPacket.attackerId),
+							tempSuPacket.damage);
+			}
 
+			if (tempSuPacket.attackerId == player.id && tempSuPacket.attackedId == target.id) {
+				// me attacking target
+				player.skills.get(tempSuPacket.skillVNum).IsOnCooldown = true;
+				onSkillHit(tempSuPacket.damage);
 			}
 			break;
 		}
-
 	}
 
 	@Override
@@ -112,7 +89,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	}
 
 	@Override
-	public void onMeGettingHit(NpcMonsterInstance mob,int damage) {
+	public void onMeGettingHit(NpcMonsterInstance mob, int damage) {
 		Statistics.dmgTaked += damage;
 
 	}
@@ -124,19 +101,15 @@ public class BattleHandler extends Handler implements IBattleHandler {
 
 	@Override
 	public void pickUpItem(MapItemInstance item) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onItemDrop(MapItemInstance item) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void onSkillHit(int damage) {
-		Statistics.dmgDealed+=damage;
+		Statistics.dmgDealed += damage;
 
 	}
 

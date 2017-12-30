@@ -38,8 +38,7 @@ public class MapDataHandler extends Handler implements IMapDataHandler,IHandler{
 			}
 			break;
 		case "lev":
-			// lev {Level} {LevelXp} {JobLevel} {JobXP} {XPLoad()} {JobLoad}
-			// {Reput} {GetCP()} {HeroXp} {HeroLevel} {HeroXPLoad()}";
+			
 			player.Level = (byte) (packet.getIntParameter(1));
 			player.LevelXp = packet.getIntParameter(2);
 			player.JobLevel = (byte) packet.getIntParameter(3);

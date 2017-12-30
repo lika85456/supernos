@@ -1,5 +1,6 @@
 package nostale.packet;
 
+
 public class Packet {
 	public PacketType packetType; // If its received or send
 	public String packetString; // Whole packet in string
@@ -14,11 +15,7 @@ public class Packet {
 	 * 
 	 * @param str
 	 */
-	public static Packet parsePacket(String p)
-	{
-		return null;
-	}
-	
+
 	public Packet(String str) {
 		this.packetString = str;
 		this.parameters = str.split(" ");
@@ -36,6 +33,10 @@ public class Packet {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	public int gip(int index)
+	{
+		return getIntParameter(index);
 	}
 
 	@Override
