@@ -7,6 +7,10 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import nostale.packet.GamePacket;
+import nostale.packet.LoginPacket;
+import nostale.packet.Packet;
+
 /*
  * @author lika85456
  * @description
@@ -43,13 +47,31 @@ public class Connection {
 
 	}
 
-	public String[] getReceived() {
+	public void SendPacket(Packet packet)
+	{
+		if(packet instanceof LoginPacket)
+		{
+			try {
+				this.send(Crypto.EncryptLoginPacket(packet.packetString));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			this.send(Crypto.EncryptGamePacket(packet.packetString, (GamePacket)packet.session, false));
+		}
+			
+	}
+	
+	private String[] getReceived() {
 		String[] received = Crypto.DecryptGamePacket(getReceivedBytes()).toArray(new String[0]);
 
 		return received;
 	}
 
-	public ArrayList<Integer> getReceivedBytes() {
+	private ArrayList<Integer> getReceivedBytes() {
 		ArrayList<Integer> received = new ArrayList<Integer>();
 		try {
 			while (in.available() > 0) {
@@ -68,7 +90,7 @@ public class Connection {
 	 * @param String packet - RAW packet to send
 	 * 
 	 */
-	public void send(String packet) throws Exception {
+	private void send(String packet) throws Exception {
 
 		// outToServer.writeBytes(packet);
 		for (int i = 0; i < packet.length(); i++) {

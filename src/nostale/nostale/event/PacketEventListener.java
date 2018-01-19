@@ -1,5 +1,12 @@
 package nostale.nostale.event;
 
-public class PacketEventListener {
+import nostale.gameobject.Player;
+
+public class PacketEventListener extends EventListener{
+
+	public PacketEventListener(Player p) {
+		super(p);
+		// TODO Auto-generated constructor stub
+	}
 
 }
