@@ -7,8 +7,6 @@ public class Packet {
 	public String name; // Name of packet, example - walk x x -> name = walk
 	protected String[] parameters;
 
-	// Packet restrictors for time
-	public int timeToWait = 0; // in miliseconds time between send delay
 
 	/**
 	 * New packet from string

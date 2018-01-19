@@ -1,6 +1,6 @@
 package nostale.data;
 
-public class NpcMonster {
+public class MonsterData {
 	public String NameID;
 
 	public short AmountRequired;

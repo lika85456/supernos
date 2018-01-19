@@ -4,7 +4,7 @@ import nostale.domain.EquipmentType;
 import nostale.domain.InventoryType;
 import nostale.domain.ItemType;
 
-public class Item {
+public class ItemData {
 	public String NameID;
 	public byte BasicUpgrade;
 	public byte CellonLvl;
@@ -85,7 +85,7 @@ public class Item {
 	public short WaterResistance;
 	public byte Width;
 
-	public Item() {
+	public ItemData() {
 
 	}
 

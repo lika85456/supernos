@@ -1,7 +1,8 @@
 package nostale.data;
 import nostale.util.Pos;
-public class NpcMonsterInstance extends NpcMonster{
+public class MonsterMapInstance{
+	public int VNum;
 	public int id;
-    public short MapId;
     public Pos Pos;
+    public int Speed;
 }

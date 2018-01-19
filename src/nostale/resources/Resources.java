@@ -8,9 +8,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-import nostale.data.Item;
-import nostale.data.NpcMonster;
-import nostale.data.Skill;
+import nostale.data.DropData;
+import nostale.data.ItemData;
+import nostale.data.MonsterData;
+import nostale.data.SkillData;
 import nostale.domain.EquipmentType;
 import nostale.domain.InventoryType;
 import nostale.domain.ItemType;
@@ -19,9 +20,10 @@ import nostale.domain.MonsterType;
 public class Resources {
 
 	// public Pos pos; //Position
-	private static HashMap<Integer, Skill> skills;
-	private static HashMap<Integer, Item> items;
-	private static HashMap<Integer, NpcMonster> mobs;
+	public static HashMap<Integer, SkillData> skills;
+	public static HashMap<Integer, ItemData> items;
+	public static HashMap<Integer, MonsterData> mobs;
+	//public static HashMap<Integer, DropData> drops;
 	private static Boolean loaded = false;
 	
 	/*public static Item[] getDrop(NpcMonster monster)
@@ -36,15 +38,16 @@ public class Resources {
 	
 	*/
 
-	public static Skill getSkill(Integer id) {
+	
+	public static SkillData getSkill(Integer id) {
 		return skills.get(id);
 	}
 
-	public static Item getItem(Integer id) {
+	public static ItemData getItem(Integer id) {
 		return items.get(id);
 	}
 
-	public static NpcMonster getMob(Integer id) {
+	public static MonsterData getMob(Integer id) {
 		return mobs.get(id);
 	}
 
@@ -63,19 +66,25 @@ public class Resources {
 	}
 
 	// TODO rewrite reading from files to FileLoader
-	public static HashMap<Integer, Skill> loadSkills() {
-		HashMap<Integer, Skill> skills = new HashMap<Integer, Skill>();
+	//TODO add drop loading
+	/*public static HashMap<Integer,DropData> loadDrops(){
+		
+	}
+	*/
+
+	public static HashMap<Integer, SkillData> loadSkills() {
+		HashMap<Integer, SkillData> skills = new HashMap<Integer, SkillData>();
 		String line;
 		int counter = 0;
 		try (InputStream fis = new FileInputStream("resources/Skill.dat");
 				InputStreamReader isr = new InputStreamReader(fis);
 				BufferedReader br = new BufferedReader(isr);) {
 
-			Skill skill = null;
+			SkillData skill = null;
 			while ((line = br.readLine()) != null) {
 				String[] currentLine = line.split("\\s+");
 				if (currentLine.length > 2 && currentLine[1].equals("VNUM")) {
-					skill = new Skill();
+					skill = new SkillData();
 					skill.SkillVNum = Short.parseShort(currentLine[2]);
 				} else if (currentLine.length > 2 && currentLine[1].equals("NAME")) {
 					skill.NameID = currentLine[2];
@@ -193,8 +202,8 @@ public class Resources {
 		return skills;
 	}
 
-	public static HashMap<Integer, NpcMonster> loadMonsters() {
-		HashMap<Integer, NpcMonster> items = new HashMap<Integer, NpcMonster>();
+	public static HashMap<Integer, MonsterData> loadMonsters() {
+		HashMap<Integer, MonsterData> items = new HashMap<Integer, MonsterData>();
 		String line;
 		try (InputStream fis = new FileInputStream("resources/Monster.dat");
 				InputStreamReader isr = new InputStreamReader(fis);
@@ -240,7 +249,7 @@ public class Resources {
 			}
 
 			long unknownData = 0;
-			NpcMonster npc = null;
+			MonsterData npc = null;
 			while ((line = br.readLine()) != null) {
 				String[] currentLine = line.split("\\s+");
 
@@ -248,7 +257,7 @@ public class Resources {
 					if (currentLine.length > 2 && currentLine[1].equals("VNUM")) {
 						if (npc != null)
 							items.put(Integer.valueOf(npc.NpcMonsterVNum), npc);
-						npc = new NpcMonster();
+						npc = new MonsterData();
 
 						npc.NpcMonsterVNum = Short.parseShort(currentLine[2]);
 					} else if (currentLine.length > 2 && currentLine[1].equals("NAME")) {
@@ -396,11 +405,11 @@ public class Resources {
 		return items;
 	}
 
-	public static HashMap<Integer, Item> loadItems() {
+	public static HashMap<Integer, ItemData> loadItems() {
 		String[] file = FileLoader.loadFile("resources/Item.dat");
 		Boolean itemAreaBegin = false;
-		Item item = new Item();
-		HashMap<Integer, Item> items = new HashMap<Integer, Item>();
+		ItemData item = new ItemData();
+		HashMap<Integer, ItemData> items = new HashMap<Integer, ItemData>();
 		for (int i = 0; i < file.length; i++) {
 			String line = file[i];
 
@@ -415,7 +424,7 @@ public class Resources {
 					continue;
 				}
 				items.put((int) item.VNum, item);
-				item = new Item();
+				item = new ItemData();
 				itemAreaBegin = false;
 			} else if (currentLine.length > 2 && currentLine[1].equals("NAME")) {
 				item.NameID = currentLine[2];

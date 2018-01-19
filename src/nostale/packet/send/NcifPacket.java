@@ -1,7 +1,7 @@
 package nostale.packet.send;
 
 import nostale.data.MapCharacterInstance;
-import nostale.data.NpcMonsterInstance;
+import nostale.data.MonsterMapInstance;
 import nostale.packet.Packet;
 
 //Information packet
@@ -11,7 +11,7 @@ public class NcifPacket extends Packet{
 	{
 		super("ncif 1 "+s.id);
 	}
-	public NcifPacket(NpcMonsterInstance s)
+	public NcifPacket(MonsterMapInstance s)
 	{
 		super("ncif 3 "+s.id);
 	}

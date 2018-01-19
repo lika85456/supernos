@@ -1,14 +1,14 @@
 package nostale.handler.interfaces;
 
 import nostale.data.MapItemInstance;
-import nostale.data.NpcMonsterInstance;
-import nostale.data.Skill;
+import nostale.data.MonsterMapInstance;
+import nostale.data.SkillData;
 
 public interface IBattleHandler {
-	public void useSkill(Skill skill);
-	public void setTarget(NpcMonsterInstance target);
-	public NpcMonsterInstance getTarget();
-	public void onMeGettingHit(NpcMonsterInstance mob, int damage);
+	public void useSkill(SkillData skill);
+	public void setTarget(MonsterMapInstance target);
+	public MonsterMapInstance getTarget();
+	public void onMeGettingHit(MonsterMapInstance mob, int damage);
 	public void onTargetDie();
 	public void pickUpItem(MapItemInstance item);
 	public void onItemDrop(MapItemInstance item);

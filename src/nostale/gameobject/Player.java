@@ -2,6 +2,10 @@ package nostale.gameobject;
 
 import nostale.net.Connection;
 import nostale.net.Crypto;
+import nostale.nostale.event.GameEvent;
+import nostale.nostale.event.GameEventListener;
+import nostale.nostale.event.PacketEvent;
+import nostale.nostale.event.PacketEventListener;
 import nostale.packet.Packet;
 
 import java.util.ArrayList;
@@ -11,53 +15,32 @@ import java.util.TimerTask;
 
 import nostale.data.AccountData;
 import nostale.data.MapCharacterInstance;
-import nostale.data.Skill;
+import nostale.data.MapInstance;
+import nostale.data.SkillData;
 import nostale.handler.Handler;
 
 public class Player extends MapCharacterInstance{
 	public AccountData accData;
-	public Timer t;
-	public TimerTask tt;
-	public int packetId = 247;
-	public Connection c;
 	public int session;
 	public int mapId;
-	public boolean IsMoving = false;
-	public HashMap<Integer,Skill> skills;
-	public ArrayList<Handler> handlers;
-	public Player()
-	{
-		skills = new HashMap<Integer,Skill>();
-		this.handlers = new ArrayList<Handler>();
-	}
+	public MapInstance map;
 	
-	public void send(Packet p)
-	{
-		try {
-			packetId++;
-			c.send(Crypto.EncryptGamePacket(packetId+" "+p.toString(), session, false));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	public ArrayList<GameEvent> gameEvent;
+	public ArrayList<PacketEvent> packetEvent;
+	public ArrayList<GameEventListener> gameEventListener;
+	public ArrayList<PacketEventListener> packetEventListener; 
 	
-	
-	public void addHandler(Handler h)
+ 	public Player()
 	{
-		handlers.add(h);
+		this.gameEvent = new ArrayList<GameEvent>();
+		this.packetEvent = new ArrayList<PacketEvent>();
+		this.gameEventListener = new ArrayList<GameEventListener>();
+		this.packetEventListener = new ArrayList<PacketEventListener>();
 	}
-	
-	public void receiveAndParse()
-	{
-		String[] rece = c.getReceived();
-		for(String rec:rece)
-		{
-			for(Handler handler:handlers)
-			{
-				handler.parsePacket(new Packet(rec));
-			}
-		}
-	}
+
+ 	public void loop()
+ 	{
+ 		//New thread
+ 	}
 
 }

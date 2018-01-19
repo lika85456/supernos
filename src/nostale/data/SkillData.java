@@ -1,6 +1,6 @@
 package nostale.data;
 
-public class Skill {
+public class SkillData {
 	public String NameID;
 
 	public short AttackAnimation;

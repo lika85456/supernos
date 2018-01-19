@@ -1,11 +1,11 @@
 import nostale.data.AccountData;
 import nostale.data.MapCharacterInstance;
-import nostale.data.NpcMonsterInstance;
+import nostale.data.MonsterMapInstance;
 import nostale.domain.AuthorityType;
 import nostale.gameobject.Player;
 import nostale.handler.BattleHandler;
 import nostale.handler.LoginHandler;
-import nostale.handler.MapDataHandler;
+import nostale.handler.MapHandler;
 import nostale.handler.WalkHandler;
 
 public class Bot {
@@ -19,7 +19,7 @@ public class Bot {
 		bot = new Player();
 		bot.accData = botData;
 		LoginHandler botLoginHandler = new LoginHandler(bot);
-		MapDataHandler mapDataHandler = new MapDataHandler(bot) {
+		MapHandler mapDataHandler = new MapHandler(bot) {
 			@Override
 			public void onPlayerIn(MapCharacterInstance player) {
 				if (player.Authority != AuthorityType.User.getValue()) { //GM on map
@@ -49,7 +49,7 @@ public class Bot {
 		
 		BattleHandler battleHandler = new BattleHandler(bot){
 			@Override
-			public void onMeGettingHit(NpcMonsterInstance mob,int damage){
+			public void onMeGettingHit(MonsterMapInstance mob,int damage){
 				super.onMeGettingHit(mob, damage);
 				if(ShouldSit)
 				{

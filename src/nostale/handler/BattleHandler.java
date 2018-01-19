@@ -3,8 +3,8 @@ package nostale.handler;
 import nostale.Statistics;
 import nostale.data.GameData;
 import nostale.data.MapItemInstance;
-import nostale.data.NpcMonsterInstance;
-import nostale.data.Skill;
+import nostale.data.MonsterMapInstance;
+import nostale.data.SkillData;
 import nostale.domain.UserType;
 import nostale.gameobject.Player;
 import nostale.handler.interfaces.IBattleHandler;
@@ -14,8 +14,8 @@ import nostale.packet.receive.SuPacket;
 import nostale.resources.Resources;
 
 public class BattleHandler extends Handler implements IBattleHandler {
-	private Skill lastSkillRequest = null;
-	private NpcMonsterInstance target = null;
+	private SkillData lastSkillRequest = null;
+	private MonsterMapInstance target = null;
 
 	public BattleHandler(Player p) {
 		super(p);
@@ -26,7 +26,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 		switch (p.name) {
 		case "ski":
 			SkiPacket temp = new SkiPacket(p.packetString);
-			for (Skill s : temp.generatedSkills) {
+			for (SkillData s : temp.generatedSkills) {
 				player.skills.put((int) s.SkillVNum, s);
 			}
 			break;
@@ -68,7 +68,7 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	}
 
 	@Override
-	public void useSkill(Skill skill) {
+	public void useSkill(SkillData skill) {
 		if (this.lastSkillRequest != null) {
 			this.lastSkillRequest = skill;
 			player.send(
@@ -78,18 +78,18 @@ public class BattleHandler extends Handler implements IBattleHandler {
 	}
 
 	@Override
-	public void setTarget(NpcMonsterInstance target) {
+	public void setTarget(MonsterMapInstance target) {
 		this.target = target;
 
 	}
 
 	@Override
-	public NpcMonsterInstance getTarget() {
+	public MonsterMapInstance getTarget() {
 		return target;
 	}
 
 	@Override
-	public void onMeGettingHit(NpcMonsterInstance mob, int damage) {
+	public void onMeGettingHit(MonsterMapInstance mob, int damage) {
 		Statistics.dmgTaked += damage;
 
 	}
