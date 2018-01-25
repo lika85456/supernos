@@ -1,6 +1,5 @@
 package nostale.packet.receive;
 
-import nostale.domain.AuthorityType;
 import nostale.domain.UserType;
 import nostale.packet.Packet;
 import nostale.util.Pos;

@@ -16,20 +16,20 @@ public class SpecialistHandler extends Handler{
 		{
 			return false;
 		}
-		player.send(new Packet("sl 0"));
+		player.sendPacket(new Packet("sl 0"));
 		try {
 			Thread.sleep(250);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		player.send(new Packet("#sl^1"));
+		player.sendPacket(new Packet("#sl^1"));
 		isOn=true;
 		return true;
 	}
 	public void putOff()
 	{
-		player.send(new Packet("sl 0"));
+		player.sendPacket(new Packet("sl 0"));
 		isOn=false;
 		
 	}
@@ -37,9 +37,5 @@ public class SpecialistHandler extends Handler{
 	{
 		return isOn;
 	}
-	@Override
-	public void parsePacket(Packet p)
-	{
-		
-	}
+
 }

@@ -3,13 +3,10 @@ package nostale.net;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
-
-import nostale.packet.GamePacket;
-import nostale.packet.LoginPacket;
-import nostale.packet.Packet;
 
 /*
  * @author lika85456
@@ -47,31 +44,8 @@ public class Connection {
 
 	}
 
-	public void SendPacket(Packet packet)
-	{
-		if(packet instanceof LoginPacket)
-		{
-			try {
-				this.send(Crypto.EncryptLoginPacket(packet.packetString));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			this.send(Crypto.EncryptGamePacket(packet.packetString, (GamePacket)packet.session, false));
-		}
-			
-	}
-	
-	private String[] getReceived() {
-		String[] received = Crypto.DecryptGamePacket(getReceivedBytes()).toArray(new String[0]);
 
-		return received;
-	}
-
-	private ArrayList<Integer> getReceivedBytes() {
+	public ArrayList<Integer> getReceived() {
 		ArrayList<Integer> received = new ArrayList<Integer>();
 		try {
 			while (in.available() > 0) {
@@ -90,14 +64,18 @@ public class Connection {
 	 * @param String packet - RAW packet to send
 	 * 
 	 */
-	private void send(String packet) throws Exception {
+	public void send(String packet){
 
 		// outToServer.writeBytes(packet);
 		for (int i = 0; i < packet.length(); i++) {
 			char c = packet.charAt(i);
 			//byte first = (byte) (c >> 8 << 8);
 			byte second = (byte) (c << 8 >> 8);
-			outToServer.writeByte(second);
+			try {
+				outToServer.writeByte(second);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			// System.out.println("First: "+first+" Second: "+second);
 
 		}

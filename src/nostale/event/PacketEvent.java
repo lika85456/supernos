@@ -1,4 +1,4 @@
-package nostale.nostale.event;
+package nostale.event;
 
 import nostale.packet.Packet;
 import nostale.packet.PacketType;

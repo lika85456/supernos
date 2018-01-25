@@ -12,7 +12,7 @@ public class InvPacket extends Packet{
 	public InventoryType inventoryType;
 	public InvPacket(String str) {
 		super(str);
-
+		items = new ArrayList<InventoryItemInstance>();
 		
 		int type = Integer.parseInt(parameters[1]);
 		this.inventoryType = InventoryType.values()[type];

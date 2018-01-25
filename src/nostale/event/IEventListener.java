@@ -1,4 +1,4 @@
-package nostale.nostale.event;
+package nostale.event;
 
 public interface IEventListener {
 	public void call();

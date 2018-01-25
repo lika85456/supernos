@@ -1,7 +1,6 @@
 package nostale.handler;
 
 import nostale.Statistics;
-import nostale.data.GameData;
 import nostale.data.MapItemInstance;
 import nostale.data.MonsterMapInstance;
 import nostale.data.SkillData;

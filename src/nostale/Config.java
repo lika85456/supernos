@@ -7,9 +7,9 @@ import nostale.data.AccountData;
 import nostale.resources.FileLoader;
 
 public class Config {
-	
-	public static String HASH = "12972B86463CB2323B1B3CE265C41BD2D1A8D3C8D4EA07DB5BA72625EDDFC94E";
-	public static String version = "0.9.3.3082";
+	//md5(nostalex.dat)+md5(nostale.dat)
+	public static String HASH = "639A66B66F59C9865459AD7BD7FE748E6E25A9C17BF35FD8F7752FF9C19D0823";
+	public static String version = "0.9.3.3081";
 	
 	public static void load()
 	{

@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 
-import nostale.data.DropData;
 import nostale.data.ItemData;
 import nostale.data.MonsterData;
 import nostale.data.SkillData;
@@ -56,6 +55,7 @@ public class Resources {
 			try {
 				skills = loadSkills();
 				items = loadItems();
+				HashMap<Integer, ItemData> itemss = items;
 				mobs = loadMonsters();
 				loaded = true;
 			} catch (Exception e) {
@@ -453,8 +453,14 @@ public class Resources {
 					item.Type = InventoryType.values()[Short.parseShort(currentLine[2])];
 					break;
 				}
-				item.ItemType = !currentLine[3].equals("-1") ? ItemType.values()[Integer.parseInt(currentLine[3])]
-						: ItemType.Weapon;
+				
+				item.ItemType = !currentLine[3].equals("-1") ? (ItemType)ItemType.fromInteger(Integer.parseInt(currentLine[3])) : ItemType.Weapon;
+				if(item.ItemType==null)
+				{
+					item.ItemType=ItemType.Weapon;
+				}
+				//System.out.print(currentLine[3]);
+				//item.ItemType = !currentLine[3].equals("-1") ? ItemType.values()[Integer.parseInt(currentLine[3])]
 				item.ItemSubType = Byte.parseByte(currentLine[4]);
 				item.EquipmentSlot = !currentLine[5].equals("-1")
 						? EquipmentType.values()[Short.parseShort(currentLine[5])] : EquipmentType.values()[0];
@@ -845,6 +851,10 @@ public class Resources {
 				item.Flag8 = currentLine[24].equals("1");
 
 			} else if (currentLine.length > 1 && currentLine[1].equals("DATA")) {
+				if(item.ItemType==null)
+				{
+					System.out.println("");
+				}
 				switch (item.ItemType) {
 				case Weapon:
 					item.LevelMinimum = Short.parseShort(currentLine[2]);
@@ -1478,13 +1488,14 @@ public class Resources {
 				int id = Integer.parseInt(currentLine[0].substring(3, currentLine[0].length() - 1));
 
 				items.forEach((k, v) -> {
-					v.Name = "";
+					String name = "";
 					if (v.NameID.equals("zts" + id + "e")) {
 						for (int ii = 1; ii < currentLine.length; ii++) {
-							v.Name += currentLine[ii] + " ";
+							name += currentLine[ii] + " ";
 						}
 
-						items.put(k, v);
+						//items.put(k, v);
+						v.Name = name;
 					}
 
 				});

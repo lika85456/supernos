@@ -39,7 +39,7 @@ public class Crypto {
 		String str_dec = "";
 		for (int i = 0; i < str.size(); i++)
 			str_dec += (char) (str.get(i) - 0xF);
-		Crypto.addToLog("Login packet income", str_dec.substring(0, str_dec.length() - 1));
+		//Crypto.addToLog("Login packet income", str_dec.substring(0, str_dec.length() - 1));
 		return str_dec.substring(0, str_dec.length() - 1);
 	}
 
@@ -47,7 +47,7 @@ public class Crypto {
 		String str_enc = "";
 		for (int i = 0; i < str.length(); i++)
 			str_enc += (char) ((str.charAt(i) ^ 0xC3) + 0xF);
-		Crypto.addToLog("Login packet sent", str);
+		//Crypto.addToLog("Login packet sent", str);
 		return str_enc += (char) 0xD8;
 	}
 
@@ -102,8 +102,8 @@ public class Crypto {
 				try {// ISO-8859-1
 					String toAdd = new String(ArrayListToString(current_packet).getBytes("ISO-8859-1"));
 					output.add(toAdd);
-					if (!toAdd.contains("mv") && !toAdd.contains("st"))
-						Crypto.addToLog("Game packet income", toAdd);
+					//if (!toAdd.contains("mv") && !toAdd.contains("st"))
+						//Crypto.addToLog("Game packet income", toAdd);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -158,7 +158,7 @@ public class Crypto {
 
 	public static String EncryptGamePacket(String buff, int session, boolean is_session_packet) {
 		// System.out.println("SEND: "+buf);
-		Crypto.addToLog("Game packet sent", buff);
+		//Crypto.addToLog("Game packet sent", buff);
 		// try {
 		// buf = new String(buf.getBytes("UTF-8"));
 		// } catch (UnsupportedEncodingException e) {

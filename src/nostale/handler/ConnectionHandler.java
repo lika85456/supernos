@@ -1,27 +1,28 @@
 package nostale.handler;
 
 
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import nostale.Config;
-import nostale.data.Character;
-import nostale.data.GameServer;
-import nostale.data.Server;
-import nostale.domain.LoginFailType;
+import nostale.event.gameEventListener.PacketReceiveListener;
+import nostale.event.gameEventListener.PacketSendListener;
 import nostale.gameobject.Player;
-import nostale.handler.interfaces.IConnectionHandler;
-import nostale.net.Connection;
-import nostale.net.Crypto;
-import nostale.util.Log;
 
-public class ConnectionHandler extends Handler implements IConnectionHandler{
-	public Connection c;
+import nostale.net.Connection;
+
+public class ConnectionHandler extends Handler{
+	public Connection connection;
 	public int session;
-	public ConnectionHandler(Player p) {
+	public int packetId = 0;
+	
+	public PacketSendListener packetSendListener;
+	public PacketReceiveListener packetReceiveListener;
+	
+	public ConnectionHandler(Player p,LoginHandler lHandler) {
 		super(p);	
+		this.packetId = lHandler.packetId;
+		this.connection = lHandler.c;
+		packetSendListener = new PacketSendListener(p,this);
+		packetReceiveListener = new PacketReceiveListener(p,this);
 	}
+	
 	
 	/*public void onLoginError(int loginError)
 	{

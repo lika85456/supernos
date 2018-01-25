@@ -1,109 +1,81 @@
 import nostale.data.AccountData;
-import nostale.data.MapCharacterInstance;
-import nostale.data.MonsterMapInstance;
-import nostale.domain.AuthorityType;
+import nostale.data.InventoryItemInstance;
+import nostale.domain.ItemType;
 import nostale.gameobject.Player;
-import nostale.handler.BattleHandler;
-import nostale.handler.LoginHandler;
+import nostale.handler.InventoryHandler;
 import nostale.handler.MapHandler;
-import nostale.handler.WalkHandler;
+import nostale.handler.SpecialistHandler;
+import nostale.resources.Resources;
+
 
 public class Bot {
-	public Boolean run = true;
 	public Player bot;
-	public AccountData botData;
 	public Thread thread;
-
-	private void bot() {
-		boolean ShouldSit = false;
-		bot = new Player();
-		bot.accData = botData;
-		LoginHandler botLoginHandler = new LoginHandler(bot);
-		MapHandler mapDataHandler = new MapHandler(bot) {
+	private boolean run = false;
+	private boolean threadRun = false;
+	public Bot(AccountData botData) {
+		bot = new Player(botData);
+		MapHandler mapHandler = new MapHandler(bot);
+		InventoryHandler inventoryHandler = new InventoryHandler(bot);
+		SpecialistHandler specialistHandler = new SpecialistHandler(bot);
+		new java.util.Timer().schedule( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		            	inventoryHandler.printInventory();
+		                InventoryItemInstance[] food = inventoryHandler.getItemsByType(ItemType.Food);
+		                inventoryHandler.useItem(food[0]);
+		                System.out.println("Ate "+Resources.getItem((int)food[0].ItemVNum).Name);
+		            }
+		        }, 
+		        5000 
+		);
+		//specialistHandler.putOn();
+		thread = new Thread(){
 			@Override
-			public void onPlayerIn(MapCharacterInstance player) {
-				if (player.Authority != AuthorityType.User.getValue()) { //GM on map
-					stop();
+			public void run()
+			{
+				while(threadRun==true)
+				{
+					while(run==true)
+					{
+						bot.loop();
+					}
 					try {
-						Thread.sleep(120000);
+						Thread.sleep(250);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					run();
 				}
-			}
-			
-			@Override
-			public void mapout()
-			{
-				stop();
-			}
-			@Override
-			public void dead()
-			{
-				stop();
-			}
-		};
-		WalkHandler walkHandler = new WalkHandler(bot);
-		
-		BattleHandler battleHandler = new BattleHandler(bot){
-			@Override
-			public void onMeGettingHit(MonsterMapInstance mob,int damage){
-				super.onMeGettingHit(mob, damage);
-				if(ShouldSit)
-				{
-					setTarget(mob);
-				}
-			}
-			
-		};
-		
-		while (run) {
-			bot.receiveAndParse();
-			//HP and sitting
-			if(bot.HP<bot.MaxHP*0.8 && bot.HP>bot.MaxHP*0.6)//if less than 80% and higher than 60%
-			{
+
 				
 			}
-		}
+		};
+	}
+	
+	public void run()
+	{
+		this.run = true;
+		this.threadRun = true;
+		if(!thread.isAlive())
+			thread.start();
+	}
+	public void stop()
+	{
+		this.run=false;
+		this.threadRun=false;
 		try {
-			bot.c.Close();
-		} catch (Exception e) {
+			thread.join();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
-
-	public Bot(AccountData botData) {
-		this.botData = botData;
-	}
-
-	public void stop() {
-		try {
-			run=false;
-			bot.c.Close();
-			thread.interrupt();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void run() {
-		thread = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				bot();
-			}
-		});
-		thread.start();
-	}
-
-	public void restart() {
+	
+	public void restart(){
 		stop();
 		run();
 	}
+
 }

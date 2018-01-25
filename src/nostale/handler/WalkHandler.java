@@ -1,6 +1,5 @@
 package nostale.handler;
 
-import nostale.data.GameData;
 import nostale.gameobject.Player;
 import nostale.packet.Packet;
 import nostale.util.Pos;

@@ -5,7 +5,6 @@ import java.util.TimerTask;
 
 import nostale.domain.RequestExchangeType;
 import nostale.gameobject.Player;
-import nostale.handler.interfaces.IHandler;
 import nostale.handler.interfaces.ITradeHandler;
 import nostale.packet.Packet;
 

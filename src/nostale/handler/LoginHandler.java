@@ -13,18 +13,19 @@ import nostale.data.Server;
 import nostale.domain.ClassType;
 import nostale.domain.LoginFailType;
 import nostale.gameobject.Player;
-import nostale.handler.interfaces.ILoginHandler;
+
 import nostale.net.Connection;
 import nostale.net.Crypto;
 import nostale.packet.Packet;
 import nostale.data.Character;
 
-public class LoginHandler extends Handler implements ILoginHandler{
+public class LoginHandler extends Handler{
+	//TODO CLEANUP
 	public AccountData accData;
 	//md5(nostalex.dat)+md5(nostale.dat)
 	private String HASH = Config.HASH;
 	private String version = Config.version;
-	private Connection c;
+	public Connection c;
 	private Server s;
 	private GameServer[] channels;
 	private HashMap<Integer,Character> characters;
@@ -32,9 +33,14 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	public TimerTask tt;
 	private int time = 0;
 	public int session;
-
+	public int packetId=254;
 	public Boolean succefullyLoggedIn = false;
 
+	public int getPacketId()
+	{
+		return packetId;
+	}
+	
 	public LoginHandler(Player p) {
 		super(p);
 		this.characters = new HashMap<Integer,Character>();
@@ -55,7 +61,7 @@ public class LoginHandler extends Handler implements ILoginHandler{
 			c.send(Crypto.EncryptLoginPacket(login_packet));
 			ArrayList<Integer> received = new ArrayList<Integer>();
 			while (received.isEmpty()) {
-				received = c.getReceivedBytes();
+				received = c.getReceived();
 			}
 			String decryptedRec = Crypto.DecryptLoginPacket(received);
 
@@ -66,10 +72,9 @@ public class LoginHandler extends Handler implements ILoginHandler{
 					selectServer(gs);
 					selectChar(characters.get(accData.Character));
 					succefullyLoggedIn = true;
-					p.c = this.c;
-					p.session = session;
-					p.t = t;
-					p.tt = tt;
+					player.log("login", "Login status: CONNECTED");
+	     			p.session = session;
+
 				}
 			}
 
@@ -88,7 +93,7 @@ public class LoginHandler extends Handler implements ILoginHandler{
 			send("select " + ch.Slot);
 			Boolean s = true;
 			while (s == true) {
-				String[] received = c.getReceived();
+				String[] received = Crypto.DecryptGamePacket(c.getReceived()).toArray(new String[0]);
 				for (String rec : received) {
 
 					if (rec.contains("OK")) {
@@ -121,7 +126,7 @@ public class LoginHandler extends Handler implements ILoginHandler{
 			if (!packet.contains("TeST")) {
 				System.out.println(packet);
 				Packet p  =new Packet(packet);
-				onError(new LoginFailType(p.getIntParameter(1)));
+				onError(p.getIntParameter(1));
 				return;
 			}
 			String[] p = packet.split(" ");
@@ -133,17 +138,23 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	}
 
 	private void selectServer(GameServer s) {
+		try {
+			c.Close();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		c = new Connection();
 		try {
 
 			c.Connect(s.ip, s.port);
-			player.packetId++;
-			c.send(Crypto.EncryptGamePacket(player.packetId +" "+Integer.toString(this.session), this.session, true));
+			packetId++;
+			c.send(Crypto.EncryptGamePacket(packetId +" "+Integer.toString(this.session), this.session, true));
 			Thread.sleep(200);
-			player.packetId++;
-			c.send(Crypto.EncryptGamePacket(player.packetId +" "+ accData.nickname, this.session, false)
-					+ Crypto.EncryptGamePacket((player.packetId + 1 )+" "+ accData.password, this.session, false));
-			player.packetId++;
+			packetId++;
+			c.send(Crypto.EncryptGamePacket(packetId +" "+ accData.nickname, this.session, false)
+					+ Crypto.EncryptGamePacket((packetId + 1 )+" "+ accData.password, this.session, false));
+			packetId+=2;
 			parseChars();
 
 			t = new Timer();
@@ -170,7 +181,7 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	private void parseChars() throws Exception {
 		String lastPacket = "";
 		while (!lastPacket.contains("clist_end")) {
-			String[] received = c.getReceived();
+			String[] received = Crypto.DecryptGamePacket(c.getReceived()).toArray(new String[0]);
 			for (String rec : received) {
 				lastPacket = rec;
 
@@ -188,8 +199,8 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	}
 
 	public void send(String s) throws Exception {
-		player.packetId++;
-		c.send(Crypto.EncryptGamePacket(player.packetId +" "+ s, this.session, false));
+		c.send(Crypto.EncryptGamePacket(packetId +" "+ s, this.session, false));
+		packetId++;
 	}
 
 	private String[] parsePacket(String packet) {
@@ -209,7 +220,7 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	}
 
 	@Override
-	public void onError(LoginFailType error) {
+	public void onError(int error) {
 		/*
 		 * 	public static final byte OldClient = 1;
 	public static final byte UnhandledError = 2;
@@ -221,36 +232,37 @@ public class LoginHandler extends Handler implements ILoginHandler{
 	public static final byte WrongCountry = 8;
 	public static final byte WrongCaps = 9;
 		 */
-			System.out.println("Cannot login because ");
-			switch(error.type)
+			String errorS = ("Cannot login because ");
+			switch(error)
 			{
 			case LoginFailType.OldClient:
-				System.out.println("old client!");
+				errorS+=("old client!");
 				break;
 			case LoginFailType.UnhandledError:
-				System.out.println("unhandled error!");
+				errorS+=("unhandled error!");
 				break;
 			case LoginFailType.Maintenance:
-				System.out.println("maintenance!");
+				errorS+=("maintenance!");
 				break;
 			case LoginFailType.AlreadyConnected:
-				System.out.println("already connected!");
+				errorS+=("already connected!");
 				break;
 			case LoginFailType.AccountOrPasswordWrong:
-				System.out.println("account or password wrong!");
+				errorS+=("account or password wrong!");
 				break;
 			case LoginFailType.CantConnect:
-				System.out.println("cannot connect!");
+				errorS+=("cannot connect!");
 				break;
 			case LoginFailType.Banned:
-				System.out.println("banned!");
+				errorS+=("banned!");
 				break;
 			case LoginFailType.WrongCountry:
-				System.out.println("wrong country!");
+				errorS+=("wrong country!");
 				break;
 			case LoginFailType.WrongCaps:
-				System.out.println("wrong caps!");
+				errorS+=("wrong caps!");
 				break;
 			}
+			player.log("LoginERROR", errorS);
 	}
 }

@@ -1,4 +1,4 @@
-package nostale.nostale.event;
+package nostale.event;
 
 import nostale.gameobject.Player;
 
@@ -8,6 +8,7 @@ public class EventListener implements IEventListener{
 	{
 		this.player = p;
 	}
+	@Override
 	public void call()
 	{
 		

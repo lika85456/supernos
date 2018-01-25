@@ -5,4 +5,7 @@ public class MonsterMapInstance{
 	public int id;
     public Pos Pos;
     public int Speed;
+    public int HP;
+    public int MP;
+	public short Level;
 }
