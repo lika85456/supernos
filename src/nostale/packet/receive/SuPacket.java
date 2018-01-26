@@ -9,7 +9,7 @@ public class SuPacket extends Packet{
 	public int attackerId;
 	public UserType attackedType;
 	public int attackedId;
-	public int skillVNum;
+	public short skillVNum;
 	public short skillCooldown;
 	public short attackAnimation;
 	public short skillEffect;
@@ -46,7 +46,7 @@ public class SuPacket extends Packet{
 			if(parameters[3].equals("3"))
 			attackedType = UserType.Monster;
 			attackedId = Integer.parseInt(parameters[4]);
-			skillVNum = Integer.parseInt(parameters[5]);
+			skillVNum = Short.parseShort(parameters[5]);
 			skillCooldown = Short.parseShort(parameters[6]);
 			attackAnimation = Short.parseShort(parameters[7]);
 			skillEffect = Short.parseShort(parameters[8]);

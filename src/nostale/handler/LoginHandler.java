@@ -219,7 +219,6 @@ public class LoginHandler extends Handler{
 		return chara;
 	}
 
-	@Override
 	public void onError(int error) {
 		/*
 		 * 	public static final byte OldClient = 1;

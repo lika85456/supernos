@@ -26,7 +26,7 @@ public class InventoryHandler extends Handler{
 	{
 		inventory.forEach((k,v) -> {
 			v.forEach((kk,vv)->{
-				System.out.println(Resources.getItem((int)vv.ItemVNum).Name+" "+vv.Amount+" "+Resources.getItem((int)vv.ItemVNum).ItemType);
+				System.out.println(Resources.getItem((int)vv.ItemVNum).Name+" "+vv.Amount+" "+Resources.getItem((int)vv.ItemVNum).ItemType+" VNUM:"+vv.ItemVNum);
 			});
 		});
 	}

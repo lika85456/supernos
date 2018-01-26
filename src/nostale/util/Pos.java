@@ -1,7 +1,10 @@
 package nostale.util;
 
 import java.util.List;
+import java.util.Map.Entry;
 
+import nostale.data.MonsterMapInstance;
+import nostale.gameobject.Player;
 import nostale.resources.Map;
 
 public class Pos {
@@ -82,6 +85,23 @@ public class Pos {
 		return toReturn;
 	}
 
+    public static MonsterMapInstance GetNearestMob(Player p)
+    {
+    	int range = 100000;
+    	MonsterMapInstance m = null;
+        for(Entry<Integer, MonsterMapInstance> entry : p.map.Mobs.entrySet()) {
+        	//Integer key = entry.getKey();
+        	MonsterMapInstance mob = entry.getValue();
+        	if(Pos.getRange(mob.Pos, p.pos)<range)
+        	{
+        		m = mob;
+        		range = Pos.getRange(mob.Pos, p.pos);
+        	}
+        }
+        return m;
+}
+	
+	
 	@Override
 	public String toString() {
 		return this.x + "|" + this.y;

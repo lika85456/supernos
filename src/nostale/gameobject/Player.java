@@ -29,6 +29,7 @@ public class Player extends MapCharacterInstance{
 	public ArrayList<GameEventListener> gameEventListeners;
 	public ArrayList<PacketEventListener> packetEventListeners; 
 	public ConnectionHandler connectionHandler;
+	public boolean IsMoving;
  	public Player(AccountData ccData)
 	{
  		this.accData = ccData;

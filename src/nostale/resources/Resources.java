@@ -454,7 +454,7 @@ public class Resources {
 					break;
 				}
 				
-				item.ItemType = !currentLine[3].equals("-1") ? (ItemType)ItemType.fromInteger(Integer.parseInt(currentLine[3])) : ItemType.Weapon;
+				item.ItemType = !currentLine[3].equals("-1") ? (ItemType)ItemType.fromInteger(Integer.parseInt(item.Type.getValue()+currentLine[3])) : ItemType.Weapon;
 				if(item.ItemType==null)
 				{
 					item.ItemType=ItemType.Weapon;

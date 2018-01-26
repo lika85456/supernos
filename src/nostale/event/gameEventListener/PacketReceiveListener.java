@@ -24,7 +24,8 @@ public class PacketReceiveListener extends GameEventListener{
 		//long time = System.currentTimeMillis();
 		for(String packet:received)
 		{
-			//player.log("Packet received", packet);
+			if(!(packet.contains("mv")) && !(packet.contains("stat")) && !(packet.contains("in")))
+			player.log("Packet received", packet);
 			GamePacket tPacket = new GamePacket(packet);
 			tPacket.packetType = PacketType.RECEIVE;
 			PacketEvent pEvent = new PacketEvent(tPacket);

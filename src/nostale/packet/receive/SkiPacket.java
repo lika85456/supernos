@@ -14,7 +14,7 @@ public class SkiPacket extends Packet{
 		this.generatedSkills = new SkillData[parameters.length-2];
 		for(int i = 2;i<parameters.length;i++)
 		{
-			this.generatedSkills[i] = Resources.getSkill(Integer.parseInt(parameters[i]));
+			this.generatedSkills[i-2] = Resources.getSkill(Integer.parseInt(parameters[i]));
 		}
 	}
 	

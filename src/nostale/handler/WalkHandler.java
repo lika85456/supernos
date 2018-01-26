@@ -11,7 +11,7 @@ public class WalkHandler extends Handler{
 	}
 	public void Walk(Pos p)
 	{
-		this.Walk(Pos.getPath(GameData.maps.get(player.mapId), player.pos, p),0);
+		this.Walk(Pos.getPath(player.map, player.pos, p),0);
 	}
 	public void Walk(int x,int y)
 	{
@@ -19,17 +19,17 @@ public class WalkHandler extends Handler{
 	}
 	private void Walk(Pos[] path,int index)
     {
-    	if(index>=path.length)
+    	if(index>=path.length-1)
     	{
     		player.IsMoving = false;
     		return;
     	}
 
         	player.IsMoving = true;
-        	player.send(new Packet("walk "+path[index].x+" "+path[index].y+" 0 "+player.Speed));
+        	player.sendPacket(new Packet("walk "+path[index].x+" "+path[index].y+" 0 "+player.Speed));
         	index++;
         	final int i = index;
-        	int timeToWait = (1000/player.Speed);
+        	int timeToWait = (1/player.Speed*1000);
         	new java.util.Timer().schedule( 
         	        new java.util.TimerTask() {
         	            @Override
